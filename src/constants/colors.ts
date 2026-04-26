@@ -24,14 +24,15 @@ export const colors = {
 // Optimized for colorblind users, high contrast with black queens/X marks
 // All colors have luminance > 0.15 for visibility
 // Maximum board size is 9×9, so 9 unique colors is sufficient
+// NOTE: Red and Pink are grouped in same family (red-pink) to prevent adjacency
 export const queenRegionColors = [
-  '#FF6B6B', // Vibrant Red
+  '#FF6B6B', // Vibrant Red (family: red-pink)
   '#FFA500', // Vibrant Orange
   '#FFD700', // Vibrant Yellow (Gold)
   '#4ECB71', // Vibrant Green
   '#5DADE2', // Vibrant Blue
   '#9B59B6', // Vibrant Purple
-  '#FF69B4', // Vibrant Pink (Hot Pink)
+  '#FF69B4', // Vibrant Pink (Hot Pink, family: red-pink)
   '#C0C0C0', // Silver Gray
   '#CD853F', // Vibrant Brown (Peru)
 ] as const;

@@ -1,5 +1,5 @@
 import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Crown } from 'lucide-react-native';
 import { QueensPuzzle } from '../../constants/types';
 import { queensEngine } from '../../engines/queens';
@@ -15,6 +15,7 @@ interface QueensBoardProps {
 }
 
 export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
+  const boardRef = useRef<View>(null);
   const [placedQueens, setPlacedQueens] = useState<[number, number][]>([]);
   const [markedCells, setMarkedCells] = useState<Set<string>>(new Set()); // X markers
   const [conflictingQueens, setConflictingQueens] = useState<Set<string>>(new Set()); // Queens with conflicts
@@ -27,7 +28,6 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
   const [hintRegion, setHintRegion] = useState<number | null>(null);
   const [hintMessage, setHintMessage] = useState<string | null>(null);
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
-  const [boardLayout, setBoardLayout] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
   const { elapsed, start, stop, reset } = useTimer();
 
   useEffect(() => {
@@ -141,22 +141,36 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
   };
 
   const handleBoardTouchMove = (event: any) => {
-    if (!pressStartCell || !boardLayout) return;
+    if (!pressStartCell || !boardRef.current) return;
 
-    // Get the touch position
     const touch = event.nativeEvent.touches[0];
     if (!touch) return;
 
-    // Calculate which cell is under the touch
-    const relativeX = touch.pageX - boardLayout.x;
-    const relativeY = touch.pageY - boardLayout.y;
+    // For React Native Web (mobile browsers), use getBoundingClientRect
+    const boardElement = boardRef.current as any;
+    if (boardElement.getBoundingClientRect) {
+      // Web/mobile browser path
+      const rect = boardElement.getBoundingClientRect();
+      const relativeX = touch.clientX - rect.left - 16; // 16 is board padding
+      const relativeY = touch.clientY - rect.top - 16;
 
-    const col = Math.floor(relativeX / cellSize);
-    const row = Math.floor(relativeY / cellSize);
+      const col = Math.floor(relativeX / cellSize);
+      const row = Math.floor(relativeY / cellSize);
 
-    // Check if the calculated position is valid
-    if (row >= 0 && row < puzzle.size && col >= 0 && col < puzzle.size) {
-      handleDragOver(row, col);
+      if (row >= 0 && row < puzzle.size && col >= 0 && col < puzzle.size) {
+        handleDragOver(row, col);
+      }
+    } else if (touch.locationX !== undefined && touch.locationY !== undefined) {
+      // Native mobile path (fallback)
+      const relativeX = touch.locationX - 16;
+      const relativeY = touch.locationY - 16;
+
+      const col = Math.floor(relativeX / cellSize);
+      const row = Math.floor(relativeY / cellSize);
+
+      if (row >= 0 && row < puzzle.size && col >= 0 && col < puzzle.size) {
+        handleDragOver(row, col);
+      }
     }
   };
 
@@ -273,11 +287,8 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
       )}
 
       <View
+        ref={boardRef}
         style={styles.board}
-        onLayout={(event) => {
-          const { x, y, width, height } = event.nativeEvent.layout;
-          setBoardLayout({ x, y, width, height });
-        }}
         onTouchMove={handleBoardTouchMove}
       >
         {puzzle.regions.map((row, r) => (

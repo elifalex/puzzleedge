@@ -25,16 +25,16 @@ const REGION_COLORS = [
 
 // PERCEPTUAL color family definitions - prevents visually similar colors
 // CRITICAL: All blue/cyan/teal variants MUST map to 'blue' family
-// CRITICAL: All pink/coral variants MUST map to their respective families
-// This ensures colors that look similar to humans are never on the same puzzle
+// CRITICAL: Red and pink are perceptually similar and MUST be in the same family
+// This ensures colors that look similar to humans are never adjacent
 const COLOR_FAMILIES = {
-  '#FF6B6B': 'red',
+  '#FF6B6B': 'red-pink',  // Red and pink are perceptually similar
   '#FFA500': 'orange',
   '#FFD700': 'yellow',
   '#4ECB71': 'green',
   '#5DADE2': 'blue',      // ONLY ONE blue family
   '#9B59B6': 'purple',
-  '#FF69B4': 'pink',
+  '#FF69B4': 'red-pink',  // Red and pink are perceptually similar
   '#C0C0C0': 'gray',
   '#CD853F': 'brown',
 };
