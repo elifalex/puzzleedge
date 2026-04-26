@@ -27,6 +27,7 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
   const [hintRegion, setHintRegion] = useState<number | null>(null);
   const [hintMessage, setHintMessage] = useState<string | null>(null);
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
+  const [boardLayout, setBoardLayout] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
   const { elapsed, start, stop, reset } = useTimer();
 
   useEffect(() => {
@@ -137,6 +138,26 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
     setPressStartCell(null);
     setIsDragging(false);
     setDragMode(null);
+  };
+
+  const handleBoardTouchMove = (event: any) => {
+    if (!pressStartCell || !boardLayout) return;
+
+    // Get the touch position
+    const touch = event.nativeEvent.touches[0];
+    if (!touch) return;
+
+    // Calculate which cell is under the touch
+    const relativeX = touch.pageX - boardLayout.x;
+    const relativeY = touch.pageY - boardLayout.y;
+
+    const col = Math.floor(relativeX / cellSize);
+    const row = Math.floor(relativeY / cellSize);
+
+    // Check if the calculated position is valid
+    if (row >= 0 && row < puzzle.size && col >= 0 && col < puzzle.size) {
+      handleDragOver(row, col);
+    }
   };
 
   const handleCellPress = (row: number, col: number) => {
@@ -251,7 +272,14 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
         </View>
       )}
 
-      <View style={styles.board}>
+      <View
+        style={styles.board}
+        onLayout={(event) => {
+          const { x, y, width, height } = event.nativeEvent.layout;
+          setBoardLayout({ x, y, width, height });
+        }}
+        onTouchMove={handleBoardTouchMove}
+      >
         {puzzle.regions.map((row, r) => (
           <View key={r} style={styles.row}>
             {row.map((regionId, c) => {
@@ -269,12 +297,6 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
                   onPressIn={() => handlePressStart(r, c)}
                   onPressOut={handlePressEnd}
                   onHoverIn={() => handleDragOver(r, c)}
-                  onTouchMove={(e) => {
-                    // For touch devices, trigger drag on the cell being touched
-                    if (pressStartCell) {
-                      handleDragOver(r, c);
-                    }
-                  }}
                   disabled={countdown !== null}
                   style={[
                     styles.cell,
