@@ -71,6 +71,23 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
     return conflicts;
   };
 
+  const checkPuzzleCompletion = (queens: [number, number][], conflicts: Set<string>) => {
+    // Check if we have the right number of queens with no conflicts
+    if (queens.length !== puzzle.size || conflicts.size > 0) {
+      return false;
+    }
+
+    // Validate all queen placements are correct
+    for (const queen of queens) {
+      const validation = validateQueenPlacement(puzzle, queens.filter(q => q !== queen), queen);
+      if (!validation.isValid) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const handlePressStart = (row: number, col: number) => {
     setPressStartCell([row, col]);
   };
@@ -193,7 +210,15 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
       // Currently has queen - remove it (go to empty)
       const newQueens = placedQueens.filter((_, i) => i !== queenIndex);
       setPlacedQueens(newQueens);
-      setConflictingQueens(findConflicts(newQueens));
+
+      const conflicts = findConflicts(newQueens);
+      setConflictingQueens(conflicts);
+
+      // Check if puzzle is complete after removal (in case we removed the last wrong queen)
+      if (checkPuzzleCompletion(newQueens, conflicts)) {
+        stop();
+        onComplete?.(elapsed);
+      }
     } else if (hasMarker) {
       // Currently has X - place queen
       // First, validate the placement
@@ -222,8 +247,8 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
       const conflicts = findConflicts(newQueens);
       setConflictingQueens(conflicts);
 
-      // Check if puzzle is complete (all queens placed with no conflicts and valid)
-      if (newQueens.length === puzzle.size && conflicts.size === 0 && validation.isValid) {
+      // Check if puzzle is complete after placement
+      if (checkPuzzleCompletion(newQueens, conflicts)) {
         stop();
         onComplete?.(elapsed);
       }
