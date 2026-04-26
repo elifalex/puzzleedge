@@ -1,33 +1,32 @@
 /**
  * Google AdSense Configuration
  *
- * IMPORTANT: Update these ad slot IDs after AdSense approval
+ * AdSense Status: APPROVED ✅
+ * Publisher ID: ca-pub-6082551497006632
  *
- * Steps to get your ad slot IDs:
- * 1. Log into Google AdSense dashboard
- * 2. Go to Ads → By ad unit
- * 3. Click "+ New ad unit"
- * 4. Create display ads for each placement below
- * 5. Copy the data-ad-slot values here
+ * Ad Units:
+ * - PuzzleEdge - Homepage Bottom Banner (3083377809)
+ * - PuzzleEdge - Daily Queens Bottom Banner (6145174937)
+ * - PuzzleEdge - Practice Queens Bottom Banner (4532190841)
  */
 
 export const AD_CONFIG = {
   // Your AdSense publisher ID
   publisherId: 'ca-pub-6082551497006632',
 
-  // Ad slot IDs - update these after creating ad units in AdSense
+  // Ad slot IDs from AdSense dashboard
   adSlots: {
-    // Homepage banner ad
-    homeBanner: '0000000000', // TODO: Replace with real ad slot ID
+    // Homepage banner ad - PuzzleEdge - Homepage Bottom Banner
+    homeBanner: '3083377809',
 
-    // Daily puzzle page banner (sticky bottom)
-    dailyPuzzleBanner: '1111111111', // TODO: Replace with real ad slot ID
+    // Daily puzzle page banner - PuzzleEdge - Daily Queens Bottom Banner
+    dailyPuzzleBanner: '6145174937',
 
-    // Practice puzzle page banner (sticky bottom)
-    practicePuzzleBanner: '2222222222', // TODO: Replace with real ad slot ID
+    // Practice puzzle page banner - PuzzleEdge - Practice Queens Bottom Banner
+    practicePuzzleBanner: '4532190841',
 
-    // How to play page banner
-    howToPlayBanner: '3333333333', // TODO: Replace with real ad slot ID
+    // How to play page banner (not yet created)
+    howToPlayBanner: '0000000000', // TODO: Create ad unit in AdSense
   },
 
   // Ad settings
@@ -35,8 +34,8 @@ export const AD_CONFIG = {
     // Enable/disable ads globally (useful for testing)
     enabled: true,
 
-    // Show test ads (will show placeholder/test ads before approval)
-    testMode: true, // Set to false after AdSense approval
+    // Test mode disabled - showing real ads
+    testMode: false,
   }
 } as const;
 
