@@ -127,7 +127,7 @@ export function AdRewarded({ visible, onClose, onReward, adSlot, rewardText = '1
                       width: '100%',
                       height: 400,
                     }}
-                    data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" // Replace with your AdSense publisher ID
+                    data-ad-client="ca-pub-6082551497006632"
                     data-ad-slot={adSlot}
                     data-ad-format="auto"
                   />

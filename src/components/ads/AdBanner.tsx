@@ -41,7 +41,7 @@ export function AdBanner({ adSlot, style }: AdBannerProps) {
         style={{
           display: 'block',
         }}
-        data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" // Replace with your AdSense publisher ID
+        data-ad-client="ca-pub-6082551497006632"
         data-ad-slot={adSlot}
         data-ad-format="auto"
         data-full-width-responsive="true"
