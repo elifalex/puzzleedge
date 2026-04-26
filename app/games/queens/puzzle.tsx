@@ -1,5 +1,5 @@
-import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
-import { useState, useEffect } from 'react';
+import { View, Text, Pressable, ScrollView, StyleSheet, Dimensions } from 'react-native';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocalSearchParams } from 'expo-router';
 import { Grid3x3 } from 'lucide-react-native';
 import { QueensBoard } from '../../../src/components/puzzles/QueensBoard';
@@ -14,6 +14,9 @@ export default function QueensPracticePage() {
   const params = useLocalSearchParams();
   const boardSize = (parseInt(params.boardSize as string) || 7) as BoardSize;
   const initialIndex = parseInt(params.index as string) || 0;
+
+  const scrollViewRef = useRef<ScrollView>(null);
+  const boardContainerRef = useRef<View>(null);
 
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [puzzle, setPuzzle] = useState<QueensPuzzle | null>(null);
@@ -31,6 +34,29 @@ export default function QueensPracticePage() {
   useEffect(() => {
     loadPuzzleData(boardSize, initialIndex);
   }, [boardSize, initialIndex]);
+
+  // Auto-scroll to board on mobile after countdown (3.5 seconds)
+  useEffect(() => {
+    const isMobile = Dimensions.get('window').width < 768;
+
+    if (isMobile && !loading && puzzle && boardContainerRef.current) {
+      // Wait for countdown to finish (3s) + small buffer (0.5s)
+      const scrollTimer = setTimeout(() => {
+        boardContainerRef.current?.measureLayout(
+          scrollViewRef.current as any,
+          (x, y) => {
+            scrollViewRef.current?.scrollTo({
+              y: y - 20, // Scroll to board with 20px top padding
+              animated: true,
+            });
+          },
+          () => {} // error callback
+        );
+      }, 3500);
+
+      return () => clearTimeout(scrollTimer);
+    }
+  }, [loading, puzzle]);
 
   const loadPuzzleData = async (size: BoardSize, index: number) => {
     setLoading(true);
@@ -108,7 +134,7 @@ export default function QueensPracticePage() {
   const isCompleted = isPuzzleCompleted(boardSize, puzzle.id);
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView ref={scrollViewRef} style={styles.container}>
       <View style={styles.content}>
         <Link href="/games/queens/practice" style={styles.backLink}>
           <Text style={styles.backText}>← Back to Categories</Text>
@@ -136,7 +162,9 @@ export default function QueensPracticePage() {
           </View>
         )}
 
-        <QueensBoard key={puzzle.id} puzzle={puzzle} mode="practice" onComplete={handleComplete} />
+        <View ref={boardContainerRef}>
+          <QueensBoard key={puzzle.id} puzzle={puzzle} mode="practice" onComplete={handleComplete} />
+        </View>
 
         <ScoreCard
           visible={showScore}
