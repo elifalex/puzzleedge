@@ -6,7 +6,7 @@
 
   <!-- Home Page -->
   <url>
-    <loc>https://dist-three-lilac.vercel.app/</loc>
+    <loc>https://puzzleedge.app/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <lastmod>2026-04-24</lastmod>
@@ -14,7 +14,7 @@
 
   <!-- Queens Game Hub -->
   <url>
-    <loc>https://dist-three-lilac.vercel.app/games/queens</loc>
+    <loc>https://puzzleedge.app/games/queens</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <lastmod>2026-04-24</lastmod>
@@ -22,7 +22,7 @@
 
   <!-- Daily Challenge -->
   <url>
-    <loc>https://dist-three-lilac.vercel.app/games/queens/daily</loc>
+    <loc>https://puzzleedge.app/games/queens/daily</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
     <lastmod>2026-04-24</lastmod>
@@ -30,7 +30,7 @@
 
   <!-- Practice Mode -->
   <url>
-    <loc>https://dist-three-lilac.vercel.app/games/queens/practice</loc>
+    <loc>https://puzzleedge.app/games/queens/practice</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <lastmod>2026-04-24</lastmod>
@@ -38,7 +38,7 @@
 
   <!-- How to Play Guide -->
   <url>
-    <loc>https://dist-three-lilac.vercel.app/how-to-play/queens</loc>
+    <loc>https://puzzleedge.app/how-to-play/queens</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <lastmod>2026-04-24</lastmod>

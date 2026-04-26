@@ -4,6 +4,9 @@
   "devCommand": "npx expo start --web",
   "installCommand": "npm install",
   "framework": null,
+  "analytics": {
+    "enable": true
+  },
   "routes": [
     {
       "src": "/assets/(.*)",

@@ -64,7 +64,7 @@ export default function QueensPracticePage() {
           'learn Queens strategy',
           'puzzle practice mode'
         ]}
-        canonicalUrl="https://dist-three-lilac.vercel.app/games/queens/practice"
+        canonicalUrl="https://puzzleedge.app/games/queens/practice"
       />
       <ScrollView style={styles.container}>
         <View style={styles.content}>

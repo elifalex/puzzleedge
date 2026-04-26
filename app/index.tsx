@@ -18,7 +18,7 @@ export default function HomePage() {
           'practice LinkedIn puzzles',
           'puzzle games like LinkedIn'
         ]}
-        canonicalUrl="https://dist-three-lilac.vercel.app"
+        canonicalUrl="https://puzzleedge.app"
       />
       <ScrollView style={styles.container}>
       <View style={styles.content}>

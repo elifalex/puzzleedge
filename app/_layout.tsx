@@ -1,6 +1,8 @@
 import '../global.css';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { Platform } from 'react-native';
+import { Analytics } from '@vercel/analytics/react';
 
 export default function RootLayout() {
   return (
@@ -12,6 +14,8 @@ export default function RootLayout() {
           contentStyle: { backgroundColor: '#0A0A0F' },
         }}
       />
+      {/* Vercel Analytics - only on web */}
+      {Platform.OS === 'web' && <Analytics />}
     </>
   );
 }

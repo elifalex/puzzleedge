@@ -15,7 +15,7 @@ export function SEO({
   description,
   keywords = [],
   canonicalUrl,
-  ogImage = 'https://dist-three-lilac.vercel.app/assets/icon.png',
+  ogImage = 'https://puzzleedge.app/assets/icon.png',
   ogType = 'website'
 }: SEOProps) {
   const fullTitle = title.includes('PuzzleEdge') ? title : `${title} | PuzzleEdge`;
@@ -106,7 +106,7 @@ export function SEO({
       "@type": "WebApplication",
       "name": "PuzzleEdge",
       "description": "Play LinkedIn Puzzles including Queens puzzle game. Free daily brain teasers and logic puzzles.",
-      "url": canonicalUrl || "https://dist-three-lilac.vercel.app",
+      "url": canonicalUrl || "https://puzzleedge.app",
       "applicationCategory": "GameApplication",
       "operatingSystem": "Web",
       "offers": {

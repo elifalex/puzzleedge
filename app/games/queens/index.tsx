@@ -18,7 +18,7 @@ export default function QueensHubPage() {
           'LinkedIn daily puzzle',
           'Queens strategy game'
         ]}
-        canonicalUrl="https://dist-three-lilac.vercel.app/games/queens"
+        canonicalUrl="https://puzzleedge.app/games/queens"
       />
       <ScrollView style={styles.container}>
       <View style={styles.content}>

@@ -18,7 +18,7 @@ export default function HowToPlayQueensPage() {
           'LinkedIn puzzle how to play',
           'Queens puzzle tutorial'
         ]}
-        canonicalUrl="https://dist-three-lilac.vercel.app/how-to-play/queens"
+        canonicalUrl="https://puzzleedge.app/how-to-play/queens"
       />
       <ScrollView style={styles.container}>
       <View style={styles.content}>

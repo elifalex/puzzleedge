@@ -47,7 +47,7 @@ export default function QueensDailyPage() {
         'Queens puzzle streak',
         'daily logic puzzle'
       ]}
-      canonicalUrl="https://dist-three-lilac.vercel.app/games/queens/daily"
+      canonicalUrl="https://puzzleedge.app/games/queens/daily"
     />
   );
 
