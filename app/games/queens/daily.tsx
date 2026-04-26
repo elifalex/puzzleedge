@@ -8,6 +8,8 @@ import { StreakBadge } from '../../../src/components/ui/StreakBadge';
 import { ScoreCard } from '../../../src/components/ui/ScoreCard';
 import { useGameStore } from '../../../src/store/gameStore';
 import { SEO } from '../../../src/components/SEO';
+import { AdBanner } from '../../../src/components/ads/AdBanner';
+import { getAdSlot } from '../../../src/config/ads';
 
 export default function QueensDailyPage() {
   const { puzzle, loading, isCompleted } = useDailyPuzzle('queens');
@@ -59,6 +61,7 @@ export default function QueensDailyPage() {
           <View style={styles.content}>
             <Text style={styles.loadingText}>Loading Queens puzzle...</Text>
           </View>
+          <AdBanner adSlot={getAdSlot('dailyPuzzleBanner')} style={styles.stickyAd} />
         </View>
       </>
     );
@@ -105,6 +108,7 @@ export default function QueensDailyPage() {
             onClose={() => setShowScore(false)}
           />
         </View>
+        <AdBanner adSlot={getAdSlot('dailyPuzzleBanner')} style={styles.stickyAd} />
       </View>
       </>
     );
@@ -113,28 +117,31 @@ export default function QueensDailyPage() {
   return (
     <>
       {seoComponent}
-      <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        <Link href="/games/queens" style={styles.backLink}>
-          <Text style={styles.backText}>← Back</Text>
-        </Link>
+      <View style={styles.container}>
+        <ScrollView style={styles.scrollContent}>
+          <View style={styles.content}>
+            <Link href="/games/queens" style={styles.backLink}>
+              <Text style={styles.backText}>← Back</Text>
+            </Link>
 
-        <Text style={styles.title}>Today's Queens Puzzle</Text>
+            <Text style={styles.title}>Today's Queens Puzzle</Text>
 
-        <View style={styles.streakContainer}>
-          <StreakBadge current={streak.current} />
-        </View>
+            <View style={styles.streakContainer}>
+              <StreakBadge current={streak.current} />
+            </View>
 
-        <QueensBoard puzzle={puzzle} mode="daily" onComplete={handleComplete} />
+            <QueensBoard puzzle={puzzle} mode="daily" onComplete={handleComplete} />
 
-        <ScoreCard
-          visible={showScore}
-          time={completionTime}
-          streak={streak.current}
-          onClose={() => setShowScore(false)}
-        />
+            <ScoreCard
+              visible={showScore}
+              time={completionTime}
+              streak={streak.current}
+              onClose={() => setShowScore(false)}
+            />
+          </View>
+        </ScrollView>
+        <AdBanner adSlot={getAdSlot('dailyPuzzleBanner')} style={styles.stickyAd} />
       </View>
-    </ScrollView>
     </>
   );
 }
@@ -144,8 +151,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0A0A0F',
   },
+  scrollContent: {
+    flex: 1,
+  },
   content: {
     padding: 32,
+    paddingBottom: 120, // Extra padding for sticky ad
+  },
+  stickyAd: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   backLink: {
     marginBottom: 32,

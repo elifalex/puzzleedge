@@ -5,6 +5,8 @@ import { CategoryCard } from '../../../src/components/ui/CategoryCard';
 import { BoardSize, getPuzzleCount } from '../../../src/data/queensPuzzleLoader';
 import { useGameStore } from '../../../src/store/gameStore';
 import { SEO } from '../../../src/components/SEO';
+import { AdBanner } from '../../../src/components/ads/AdBanner';
+import { getAdSlot } from '../../../src/config/ads';
 
 const BOARD_SIZES: BoardSize[] = [6, 7, 8, 9];
 
@@ -66,38 +68,41 @@ export default function QueensPracticePage() {
         ]}
         canonicalUrl="https://puzzleedge.app/games/queens/practice"
       />
-      <ScrollView style={styles.container}>
-        <View style={styles.content}>
-        <Link href="/games/queens" style={styles.backLink}>
-          <Text style={styles.backText}>← Back</Text>
-        </Link>
+      <View style={styles.container}>
+        <ScrollView style={styles.scrollContent}>
+          <View style={styles.content}>
+            <Link href="/games/queens" style={styles.backLink}>
+              <Text style={styles.backText}>← Back</Text>
+            </Link>
 
-        <Text style={styles.title}>Unlimited Queens Practice</Text>
-        <Text style={styles.subtitle}>
-          Select a category and choose any Queens puzzle to practice
-        </Text>
+            <Text style={styles.title}>Unlimited Queens Practice</Text>
+            <Text style={styles.subtitle}>
+              Select a category and choose any Queens puzzle to practice
+            </Text>
 
-        <View style={styles.categories}>
-          {BOARD_SIZES.map((size) => {
-            const completedIds = getCompletedPuzzleIds(size);
-            const totalPuzzles = puzzleCounts[size];
+            <View style={styles.categories}>
+              {BOARD_SIZES.map((size) => {
+                const completedIds = getCompletedPuzzleIds(size);
+                const totalPuzzles = puzzleCounts[size];
 
-            return (
-              <CategoryCard
-                key={size}
-                boardSize={size}
-                totalPuzzles={totalPuzzles}
-                completedCount={completedIds.length}
-                isExpanded={expandedCategory === size}
-                onToggle={() => handleToggle(size)}
-                onSelectPuzzle={(index) => handleSelectPuzzle(size, index)}
-                completedPuzzleIds={completedIds}
-              />
-            );
-          })}
-        </View>
+                return (
+                  <CategoryCard
+                    key={size}
+                    boardSize={size}
+                    totalPuzzles={totalPuzzles}
+                    completedCount={completedIds.length}
+                    isExpanded={expandedCategory === size}
+                    onToggle={() => handleToggle(size)}
+                    onSelectPuzzle={(index) => handleSelectPuzzle(size, index)}
+                    completedPuzzleIds={completedIds}
+                  />
+                );
+              })}
+            </View>
+          </View>
+        </ScrollView>
+        <AdBanner adSlot={getAdSlot('practicePuzzleBanner')} style={styles.stickyAd} />
       </View>
-    </ScrollView>
     </>
   );
 }
@@ -107,8 +112,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0A0A0F',
   },
+  scrollContent: {
+    flex: 1,
+  },
   content: {
     padding: 32,
+    paddingBottom: 120, // Extra padding for sticky ad
+  },
+  stickyAd: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   backLink: {
     marginBottom: 32,
