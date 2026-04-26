@@ -140,19 +140,31 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
     setDragMode(null);
   };
 
-  const handleBoardTouchMove = (event: any) => {
+  const handleBoardResponderMove = (event: any) => {
     if (!pressStartCell || !boardRef.current) return;
 
-    const touch = event.nativeEvent.touches[0];
-    if (!touch) return;
-
-    // For React Native Web (mobile browsers), use getBoundingClientRect
     const boardElement = boardRef.current as any;
-    if (boardElement.getBoundingClientRect) {
-      // Web/mobile browser path
-      const rect = boardElement.getBoundingClientRect();
-      const relativeX = touch.clientX - rect.left - 16; // 16 is board padding
-      const relativeY = touch.clientY - rect.top - 16;
+
+    // Try to get touch coordinates from the event
+    let touchX: number | undefined;
+    let touchY: number | undefined;
+
+    // Method 1: Check for touches array (most reliable for React Native Web)
+    if (event.nativeEvent.touches && event.nativeEvent.touches[0]) {
+      const touch = event.nativeEvent.touches[0];
+      touchX = touch.clientX;
+      touchY = touch.clientY;
+    }
+    // Method 2: Check for pageX/pageY directly on nativeEvent (responder events)
+    else if (event.nativeEvent.pageX !== undefined && event.nativeEvent.pageY !== undefined) {
+      touchX = event.nativeEvent.pageX;
+      touchY = event.nativeEvent.pageY;
+    }
+    // Method 3: Check for locationX/locationY (native mobile)
+    else if (event.nativeEvent.locationX !== undefined && event.nativeEvent.locationY !== undefined) {
+      // For native, locationX/locationY are relative to the board already
+      const relativeX = event.nativeEvent.locationX - 16;
+      const relativeY = event.nativeEvent.locationY - 16;
 
       const col = Math.floor(relativeX / cellSize);
       const row = Math.floor(relativeY / cellSize);
@@ -160,10 +172,14 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
       if (row >= 0 && row < puzzle.size && col >= 0 && col < puzzle.size) {
         handleDragOver(row, col);
       }
-    } else if (touch.locationX !== undefined && touch.locationY !== undefined) {
-      // Native mobile path (fallback)
-      const relativeX = touch.locationX - 16;
-      const relativeY = touch.locationY - 16;
+      return;
+    }
+
+    // If we have absolute coordinates (clientX/pageX), calculate relative position
+    if (touchX !== undefined && touchY !== undefined && boardElement.getBoundingClientRect) {
+      const rect = boardElement.getBoundingClientRect();
+      const relativeX = touchX - rect.left - 16; // 16 is board padding
+      const relativeY = touchY - rect.top - 16;
 
       const col = Math.floor(relativeX / cellSize);
       const row = Math.floor(relativeY / cellSize);
@@ -172,6 +188,10 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
         handleDragOver(row, col);
       }
     }
+  };
+
+  const handleBoardResponderRelease = () => {
+    handlePressEnd();
   };
 
   const handleCellPress = (row: number, col: number) => {
@@ -289,7 +309,9 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
       <View
         ref={boardRef}
         style={styles.board}
-        onTouchMove={handleBoardTouchMove}
+        onMoveShouldSetResponderCapture={() => pressStartCell !== null}
+        onResponderMove={handleBoardResponderMove}
+        onResponderRelease={handleBoardResponderRelease}
       >
         {puzzle.regions.map((row, r) => (
           <View key={r} style={styles.row}>
