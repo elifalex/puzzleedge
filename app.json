@@ -1,12 +1,13 @@
 {
   "expo": {
-    "name": "puzzleedge",
+    "name": "PuzzleEdge - LinkedIn Puzzles & Brain Games",
     "slug": "puzzleedge",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
+    "description": "Play LinkedIn Puzzles including Queens puzzle game. Free daily brain teasers, logic puzzles, and puzzle games similar to LinkedIn puzzles. Challenge your mind with unlimited practice puzzles.",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -24,7 +25,21 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "favicon": "./assets/favicon.png",
+      "name": "PuzzleEdge - LinkedIn Puzzles & Brain Games",
+      "shortName": "PuzzleEdge",
+      "lang": "en",
+      "scope": "/",
+      "startUrl": "/",
+      "backgroundColor": "#0A0A0F",
+      "themeColor": "#4F6EF7",
+      "description": "Play LinkedIn Puzzles including Queens puzzle game. Free daily brain teasers, logic puzzles, and puzzle games similar to LinkedIn puzzles.",
+      "dir": "ltr",
+      "display": "standalone",
+      "orientation": "portrait"
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }
