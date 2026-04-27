@@ -97,34 +97,44 @@ const getInitialState = () => {
   };
 };
 
+const storeImpl = (set: any) => ({
+  setSoundEnabled: (enabled: boolean) => {
+    set({ soundEnabled: enabled });
+  },
+
+  setPreferredDifficulty: (difficulty: Difficulty) => {
+    set({ preferredDifficulty: difficulty });
+  },
+
+  useHint: (gameType: string) => {
+    set((state: SettingsStore) => ({
+      hintsRemaining: {
+        ...state.hintsRemaining,
+        [gameType]: Math.max(0, (state.hintsRemaining[gameType] || 3) - 1),
+      },
+    }));
+  },
+
+  resetHints: (gameType: string) => {
+    set((state: SettingsStore) => ({
+      hintsRemaining: {
+        ...state.hintsRemaining,
+        [gameType]: 3,
+      },
+    }));
+  },
+});
+
 export const useSettingsStore = create<SettingsStore>()(
-  persistMiddleware((set: any) => ({
-    ...getInitialState(),
-
-    setSoundEnabled: (enabled: boolean) => {
-      set({ soundEnabled: enabled });
-    },
-
-    setPreferredDifficulty: (difficulty: Difficulty) => {
-      set({ preferredDifficulty: difficulty });
-    },
-
-    useHint: (gameType: string) => {
-      set((state: SettingsStore) => ({
-        hintsRemaining: {
-          ...state.hintsRemaining,
-          [gameType]: Math.max(0, (state.hintsRemaining[gameType] || 3) - 1),
-        },
-      }));
-    },
-
-    resetHints: (gameType: string) => {
-      set((state: SettingsStore) => ({
-        hintsRemaining: {
-          ...state.hintsRemaining,
-          [gameType]: 3,
-        },
-      }));
-    },
-  }))
+  persistMiddleware((set: any) => {
+    const initialData = getInitialState();
+    return {
+      // Initialize data properties with loaded state or defaults
+      soundEnabled: initialData.soundEnabled !== undefined ? initialData.soundEnabled : true,
+      preferredDifficulty: initialData.preferredDifficulty || ('medium' as Difficulty),
+      hintsRemaining: initialData.hintsRemaining || {},
+      // Add action methods
+      ...storeImpl(set),
+    };
+  })
 );

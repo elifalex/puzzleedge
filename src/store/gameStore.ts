@@ -92,11 +92,6 @@ const persistMiddleware = (config: any) => (set: any, get: any, api: any) => {
 };
 
 const storeImpl = (set: any, get: any) => ({
-  dailyCompletions: {},
-  streaks: {},
-  scores: {},
-  completedPuzzles: {},
-
   markDailyComplete: (gameType: string, date: string, score: GameScore) => {
     set((state: GameStore) => ({
       dailyCompletions: {
@@ -223,8 +218,16 @@ const getInitialState = () => {
 };
 
 export const useGameStore = create<GameStore>()(
-  persistMiddleware((set: any, get: any) => ({
-    ...getInitialState(),
-    ...storeImpl(set, get),
-  }))
+  persistMiddleware((set: any, get: any) => {
+    const initialData = getInitialState();
+    return {
+      // Initialize data properties with loaded state or empty objects
+      dailyCompletions: initialData.dailyCompletions || {},
+      streaks: initialData.streaks || {},
+      scores: initialData.scores || {},
+      completedPuzzles: initialData.completedPuzzles || {},
+      // Add action methods
+      ...storeImpl(set, get),
+    };
+  })
 );
