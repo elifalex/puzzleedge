@@ -2,38 +2,36 @@ import { View, Text, Pressable, ScrollView, StyleSheet, Dimensions } from 'react
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocalSearchParams } from 'expo-router';
 import { Grid3x3 } from 'lucide-react-native';
-import { QueensBoard } from '../../../src/components/puzzles/QueensBoard';
+import { TangoBoard } from '../../../src/components/puzzles/TangoBoard';
 import { PuzzleNavigator } from '../../../src/components/ui/PuzzleNavigator';
-import { PuzzleSelector } from '../../../src/components/ui/PuzzleSelector';
 import { ScoreCard } from '../../../src/components/ui/ScoreCard';
-import { BoardSize, getPuzzleByIndex, getPuzzleCount } from '../../../src/data/queensPuzzleLoader';
-import { QueensPuzzle } from '../../../src/constants/types';
+import { getPuzzleByIndex, getPuzzleCount } from '../../../src/data/tangoPuzzleLoader';
+import { TangoPuzzle } from '../../../src/constants/types';
+import { Difficulty } from '../../../src/constants/gameConfig';
 import { useGameStore } from '../../../src/store/gameStore';
 
-export default function QueensPracticePage() {
+export default function TangoPracticePage() {
   const params = useLocalSearchParams();
-  const boardSize = (parseInt(params.boardSize as string) || 7) as BoardSize;
+  const difficulty = (params.difficulty as Difficulty) || 'medium';
   const initialIndex = parseInt(params.index as string) || 0;
 
   const scrollViewRef = useRef<ScrollView>(null);
   const boardContainerRef = useRef<View>(null);
 
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
-  const [puzzle, setPuzzle] = useState<QueensPuzzle | null>(null);
+  const [puzzle, setPuzzle] = useState<TangoPuzzle | null>(null);
   const [loading, setLoading] = useState(true);
   const [totalPuzzles, setTotalPuzzles] = useState(0);
-  const [showSelector, setShowSelector] = useState(false);
   const [showScore, setShowScore] = useState(false);
   const [completionTime, setCompletionTime] = useState(0);
 
   const markPuzzleComplete = useGameStore((s) => s.markPuzzleComplete);
   const isPuzzleCompleted = useGameStore((s) => s.isPuzzleCompleted);
-  const getCompletedPuzzleIds = useGameStore((s) => s.getCompletedPuzzleIds);
 
   // Load puzzle count and initial puzzle
   useEffect(() => {
-    loadPuzzleData(boardSize, initialIndex);
-  }, [boardSize, initialIndex]);
+    loadPuzzleData(difficulty, initialIndex);
+  }, [difficulty, initialIndex]);
 
   // Auto-scroll to board on mobile immediately
   useEffect(() => {
@@ -58,12 +56,12 @@ export default function QueensPracticePage() {
     }
   }, [loading, puzzle]);
 
-  const loadPuzzleData = async (size: BoardSize, index: number) => {
+  const loadPuzzleData = async (diff: Difficulty, index: number) => {
     setLoading(true);
     try {
       const [count, puzzleData] = await Promise.all([
-        getPuzzleCount(size),
-        getPuzzleByIndex(size, index),
+        getPuzzleCount(diff),
+        getPuzzleByIndex(diff, index),
       ]);
 
       setTotalPuzzles(count);
@@ -81,26 +79,21 @@ export default function QueensPracticePage() {
 
   const handlePreviousPuzzle = () => {
     if (currentIndex > 0) {
-      loadPuzzleData(boardSize, currentIndex - 1);
+      loadPuzzleData(difficulty, currentIndex - 1);
       setShowScore(false);
     }
   };
 
   const handleNextPuzzle = () => {
     if (currentIndex < totalPuzzles - 1) {
-      loadPuzzleData(boardSize, currentIndex + 1);
+      loadPuzzleData(difficulty, currentIndex + 1);
       setShowScore(false);
     }
   };
 
-  const handleSelectPuzzle = (index: number) => {
-    loadPuzzleData(boardSize, index);
-    setShowScore(false);
-  };
-
   const handleComplete = (time: number) => {
     if (puzzle) {
-      markPuzzleComplete(boardSize, puzzle.id, {
+      markPuzzleComplete(difficulty, puzzle.id, {
         time,
         hintsUsed: 0,
         completed: true,
@@ -121,7 +114,7 @@ export default function QueensPracticePage() {
     return (
       <View style={styles.container}>
         <View style={styles.content}>
-          <Link href="/games/queens/practice" style={styles.backLink}>
+          <Link href="/games/tango/practice" style={styles.backLink}>
             <Text style={styles.backText}>← Back to Categories</Text>
           </Link>
           <Text style={styles.loadingText}>Loading puzzle...</Text>
@@ -130,18 +123,20 @@ export default function QueensPracticePage() {
     );
   }
 
-  const completedIds = getCompletedPuzzleIds(boardSize);
-  const isCompleted = isPuzzleCompleted(boardSize, puzzle.id);
+  const isCompleted = isPuzzleCompleted(difficulty, puzzle.id);
 
   return (
     <View style={styles.wrapper}>
       <ScrollView ref={scrollViewRef} style={styles.container}>
         <View style={styles.content}>
-          <Link href="/games/queens/practice" style={styles.backLink}>
+          <Link href="/games/tango/practice" style={styles.backLink}>
             <Text style={styles.backText}>← Back to Categories</Text>
           </Link>
 
-          <Text style={styles.title}>Queens Practice</Text>
+          <Text style={styles.title}>Tango Practice</Text>
+          <Text style={styles.difficultyBadge}>
+            {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+          </Text>
 
           <View style={styles.infoBar}>
             <PuzzleNavigator
@@ -150,11 +145,6 @@ export default function QueensPracticePage() {
               onPrevious={handlePreviousPuzzle}
               onNext={handleNextPuzzle}
             />
-
-            <Pressable onPress={() => setShowSelector(true)} style={styles.gridButton}>
-              <Grid3x3 size={18} color="#4F6EF7" />
-              <Text style={styles.gridButtonText}>All Puzzles</Text>
-            </Pressable>
           </View>
 
           {isCompleted && (
@@ -164,7 +154,7 @@ export default function QueensPracticePage() {
           )}
 
           <View ref={boardContainerRef}>
-            <QueensBoard key={puzzle.id} puzzle={puzzle} mode="practice" onComplete={handleComplete} />
+            <TangoBoard key={puzzle.id} puzzle={puzzle} mode="practice" onComplete={handleComplete} />
           </View>
 
           <ScoreCard
@@ -173,17 +163,6 @@ export default function QueensPracticePage() {
             onNext={currentIndex < totalPuzzles - 1 ? handleScoreNext : undefined}
             onClose={() => setShowScore(false)}
           />
-
-          {showSelector && (
-            <PuzzleSelector
-              boardSize={boardSize}
-              totalPuzzles={totalPuzzles}
-              currentIndex={currentIndex}
-              completedPuzzleIds={completedIds}
-              onSelectPuzzle={handleSelectPuzzle}
-              onClose={() => setShowSelector(false)}
-            />
-          )}
         </View>
       </ScrollView>
     </View>
@@ -220,28 +199,17 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#F0F0F8',
     textAlign: 'center',
-    marginBottom: 32,
+    marginBottom: 8,
+  },
+  difficultyBadge: {
+    fontSize: 16,
+    color: '#4F6EF7',
+    textAlign: 'center',
+    marginBottom: 24,
+    fontWeight: '600',
   },
   infoBar: {
     marginBottom: 16,
-  },
-  gridButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#4F6EF7',
-    backgroundColor: '#13131A',
-    marginTop: 12,
-  },
-  gridButtonText: {
-    color: '#4F6EF7',
-    fontSize: 14,
-    fontWeight: '600',
   },
   completedBadge: {
     backgroundColor: 'rgba(34, 197, 94, 0.15)',

@@ -9,7 +9,7 @@
     <loc>https://puzzleedge.app/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <lastmod>2026-04-24</lastmod>
+    <lastmod>2026-04-28</lastmod>
   </url>
 
   <!-- Queens Game Hub -->
@@ -42,6 +42,38 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <lastmod>2026-04-24</lastmod>
+  </url>
+
+  <!-- Tango Game Hub -->
+  <url>
+    <loc>https://puzzleedge.app/games/tango</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <lastmod>2026-04-28</lastmod>
+  </url>
+
+  <!-- Tango Daily Challenge -->
+  <url>
+    <loc>https://puzzleedge.app/games/tango/daily</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+    <lastmod>2026-04-28</lastmod>
+  </url>
+
+  <!-- Tango Practice Mode -->
+  <url>
+    <loc>https://puzzleedge.app/games/tango/practice</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-04-28</lastmod>
+  </url>
+
+  <!-- How to Play Tango Guide -->
+  <url>
+    <loc>https://puzzleedge.app/how-to-play/tango</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2026-04-28</lastmod>
   </url>
 
   <!-- Articles Index -->
@@ -90,6 +122,14 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <lastmod>2026-04-27</lastmod>
+  </url>
+
+  <!-- Article: Tango Beginner's Guide -->
+  <url>
+    <loc>https://puzzleedge.app/articles/tango-beginners-guide</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-04-28</lastmod>
   </url>
 
 </urlset>

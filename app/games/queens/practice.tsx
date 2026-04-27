@@ -5,8 +5,6 @@ import { CategoryCard } from '../../../src/components/ui/CategoryCard';
 import { BoardSize, getPuzzleCount } from '../../../src/data/queensPuzzleLoader';
 import { useGameStore } from '../../../src/store/gameStore';
 import { SEO } from '../../../src/components/SEO';
-import { AdBanner } from '../../../src/components/ads/AdBanner';
-import { getAdSlot } from '../../../src/config/ads';
 
 const BOARD_SIZES: BoardSize[] = [6, 7, 8, 9];
 
@@ -101,7 +99,6 @@ export default function QueensPracticePage() {
             </View>
           </View>
         </ScrollView>
-        <AdBanner adSlot={getAdSlot('practicePuzzleBanner')} style={styles.stickyAd} />
       </View>
     </>
   );
@@ -117,7 +114,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 32,
-    paddingBottom: 120, // Extra padding for sticky ad
+    paddingBottom: 32, // Extra padding for sticky ad
   },
   stickyAd: {
     position: 'absolute',

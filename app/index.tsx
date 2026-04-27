@@ -1,20 +1,20 @@
 import { View, Text, Pressable, ScrollView, StyleSheet, Image } from 'react-native';
 import { Link } from 'expo-router';
 import { SEO } from '../src/components/SEO';
-import { AdBanner } from '../src/components/ads/AdBanner';
-import { getAdSlot } from '../src/config/ads';
 
 export default function HomePage() {
   return (
     <>
       <SEO
-        title="PuzzleEdge - LinkedIn Puzzles & Brain Games | Play Queens Puzzle"
-        description="Play LinkedIn Puzzles for free! Master the Queens puzzle game with daily challenges and unlimited practice. Train your brain with logic puzzles similar to LinkedIn's daily puzzle games."
+        title="PuzzleEdge - LinkedIn Puzzles & Brain Games | Queens & Tango Puzzles"
+        description="Play LinkedIn Puzzles for free! Master Queens and Tango puzzle games with daily challenges and unlimited practice. Train your brain with logic puzzles similar to LinkedIn's daily puzzle games."
         keywords={[
           'LinkedIn Queens puzzle',
+          'LinkedIn Tango puzzle',
           'free LinkedIn puzzles',
           'LinkedIn puzzle game online',
           'Queens puzzle solver',
+          'Tango puzzle solver',
           'daily puzzle challenge',
           'LinkedIn games free',
           'practice LinkedIn puzzles',
@@ -22,9 +22,8 @@ export default function HomePage() {
         ]}
         canonicalUrl="https://puzzleedge.app"
       />
-      <View style={styles.wrapper}>
-        <ScrollView style={styles.container}>
-          <View style={styles.content}>
+      <ScrollView style={styles.container}>
+        <View style={styles.content}>
             {/* Hero Section */}
             <View style={styles.hero}>
               <Image
@@ -33,13 +32,13 @@ export default function HomePage() {
                 resizeMode="contain"
               />
               <Text style={styles.subtitle}>
-                Master LinkedIn's Daily Queens Puzzle with Unlimited Practice
+                Master LinkedIn's Daily Puzzles with Unlimited Practice
               </Text>
 
               {/* Value Props */}
               <Text style={styles.description}>
-                Train for LinkedIn's daily Queens puzzle game with 1,600+ practice puzzles.
-                Perfect your Queens puzzle strategy, beat your colleagues, and never miss a streak.
+                Train for LinkedIn's daily puzzle games with 2,800+ practice puzzles.
+                Perfect your Queens and Tango puzzle strategy, beat your colleagues, and never miss a streak.
               </Text>
             </View>
 
@@ -62,11 +61,20 @@ export default function HomePage() {
                 </Pressable>
               </Link>
 
-              {/* Coming Soon Cards */}
-              <View style={[styles.card, styles.cardDisabled]}>
-                <Text style={styles.cardTitleDisabled}>Tango</Text>
-                <Text style={styles.cardDescriptionDisabled}>Coming Soon</Text>
-              </View>
+              {/* Tango Card */}
+              <Link href="/games/tango" asChild>
+                <Pressable style={styles.card}>
+                  <View style={styles.cardContent}>
+                    <View style={styles.cardText}>
+                      <Text style={styles.cardTitle}>☀️🌑 Tango Puzzle</Text>
+                      <Text style={styles.cardDescription}>
+                        The LinkedIn Tango puzzle: Fill the grid with suns and moons. Equal balance in rows/columns, no three-in-a-row. Daily challenges + 1,200 practice puzzles.
+                      </Text>
+                    </View>
+                    <Text style={styles.arrow}>→</Text>
+                  </View>
+                </Pressable>
+              </Link>
 
               <View style={[styles.card, styles.cardDisabled]}>
                 <Text style={styles.cardTitleDisabled}>Zip</Text>
@@ -125,34 +133,23 @@ export default function HomePage() {
                 endorsed by, or connected to LinkedIn Corporation.
               </Text>
             </View>
-          </View>
-        </ScrollView>
-        <AdBanner adSlot={getAdSlot('homeBanner')} style={styles.stickyAd} />
-      </View>
+        </View>
+      </ScrollView>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-    backgroundColor: '#0A0A0F',
-  },
   container: {
     flex: 1,
+    backgroundColor: '#0A0A0F',
   },
   content: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 32,
-    paddingBottom: 120, // Extra padding for sticky ad
-  },
-  stickyAd: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    paddingBottom: 32,
   },
   hero: {
     maxWidth: 896,

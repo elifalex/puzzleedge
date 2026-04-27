@@ -3,15 +3,15 @@ import { useState } from 'react';
 import { Link } from 'expo-router';
 import { useDailyPuzzle } from '../../../src/hooks/useDailyPuzzle';
 import { useStreak } from '../../../src/hooks/useStreak';
-import { QueensBoard } from '../../../src/components/puzzles/QueensBoard';
+import { TangoBoard } from '../../../src/components/puzzles/TangoBoard';
 import { StreakBadge } from '../../../src/components/ui/StreakBadge';
 import { ScoreCard } from '../../../src/components/ui/ScoreCard';
 import { useGameStore } from '../../../src/store/gameStore';
 import { SEO } from '../../../src/components/SEO';
 
-export default function QueensDailyPage() {
-  const { puzzle, loading, isCompleted } = useDailyPuzzle('queens');
-  const streak = useStreak('queens');
+export default function TangoDailyPage() {
+  const { puzzle, loading, isCompleted } = useDailyPuzzle('tango');
+  const streak = useStreak('tango');
   const markDailyComplete = useGameStore((s) => s.markDailyComplete);
   const getDailyCompletion = useGameStore((s) => s.getDailyCompletion);
   const [showScore, setShowScore] = useState(false);
@@ -19,11 +19,11 @@ export default function QueensDailyPage() {
 
   // If already completed, get the stored completion time
   const today = new Date().toISOString().split('T')[0];
-  const dailyCompletion = getDailyCompletion('queens', today);
+  const dailyCompletion = getDailyCompletion('tango', today);
 
   const handleComplete = (time: number) => {
     const today = new Date().toISOString().split('T')[0];
-    markDailyComplete('queens', today, {
+    markDailyComplete('tango', today, {
       time,
       hintsUsed: 0,
       completed: true,
@@ -35,19 +35,20 @@ export default function QueensDailyPage() {
 
   const seoComponent = (
     <SEO
-      title="Daily Queens Puzzle Challenge - LinkedIn Queens Puzzle Today"
-      description="Play today's LinkedIn Queens puzzle challenge! Compete daily, track your streak, and sharpen your logic skills with our free daily Queens puzzle game."
+      title="Daily Tango Puzzle Challenge - LinkedIn Tango Puzzle Today"
+      description="Play today's LinkedIn Tango puzzle challenge! Compete daily, track your streak, and sharpen your logic skills with our free daily Tango puzzle game."
       keywords={[
-        'daily Queens puzzle',
+        'daily Tango puzzle',
         'LinkedIn daily puzzle',
-        'today Queens puzzle',
-        'Queens daily challenge',
+        'today Tango puzzle',
+        'Tango daily challenge',
         'LinkedIn puzzle today',
         'daily brain teaser',
-        'Queens puzzle streak',
-        'daily logic puzzle'
+        'Tango puzzle streak',
+        'daily logic puzzle',
+        'sun moon puzzle daily'
       ]}
-      canonicalUrl="https://puzzleedge.app/games/queens/daily"
+      canonicalUrl="https://puzzleedge.app/games/tango/daily"
     />
   );
 
@@ -57,7 +58,7 @@ export default function QueensDailyPage() {
         {seoComponent}
         <View style={styles.container}>
           <View style={styles.content}>
-            <Text style={styles.loadingText}>Loading Queens puzzle...</Text>
+            <Text style={styles.loadingText}>Loading Tango puzzle...</Text>
           </View>
         </View>
       </>
@@ -69,43 +70,43 @@ export default function QueensDailyPage() {
       <>
         {seoComponent}
         <View style={styles.container}>
-        <View style={styles.content}>
-          <Link href="/games/queens" style={styles.backLink}>
-            <Text style={styles.backText}>← Back</Text>
-          </Link>
-
-          <Text style={styles.title}>Today's Queens Puzzle</Text>
-
-          <View style={styles.streakContainer}>
-            <StreakBadge current={streak.current} />
-          </View>
-
-          <View style={styles.completedContainer}>
-            <Text style={styles.completedTitle}>Queens Puzzle Completed! ✅</Text>
-            <Text style={styles.completedText}>
-              Come back tomorrow for a new daily Queens puzzle
-            </Text>
-
-            <Pressable
-              style={styles.viewScoreButton}
-              onPress={() => setShowScore(true)}
-            >
-              <Text style={styles.viewScoreText}>View Your Score</Text>
-            </Pressable>
-
-            <Link href="/games/queens/practice" style={styles.practiceLink}>
-              <Text style={styles.practiceLinkText}>Try Unlimited Queens Practice →</Text>
+          <View style={styles.content}>
+            <Link href="/games/tango" style={styles.backLink}>
+              <Text style={styles.backText}>← Back</Text>
             </Link>
-          </View>
 
-          <ScoreCard
-            visible={showScore}
-            time={dailyCompletion.score.time}
-            streak={streak.current}
-            onClose={() => setShowScore(false)}
-          />
+            <Text style={styles.title}>Today's Tango Puzzle</Text>
+
+            <View style={styles.streakContainer}>
+              <StreakBadge current={streak.current} />
+            </View>
+
+            <View style={styles.completedContainer}>
+              <Text style={styles.completedTitle}>Tango Puzzle Completed! ✅</Text>
+              <Text style={styles.completedText}>
+                Come back tomorrow for a new daily Tango puzzle
+              </Text>
+
+              <Pressable
+                style={styles.viewScoreButton}
+                onPress={() => setShowScore(true)}
+              >
+                <Text style={styles.viewScoreText}>View Your Score</Text>
+              </Pressable>
+
+              <Link href="/games/tango/practice" style={styles.practiceLink}>
+                <Text style={styles.practiceLinkText}>Try Unlimited Tango Practice →</Text>
+              </Link>
+            </View>
+
+            <ScoreCard
+              visible={showScore}
+              time={dailyCompletion.score.time}
+              streak={streak.current}
+              onClose={() => setShowScore(false)}
+            />
+          </View>
         </View>
-      </View>
       </>
     );
   }
@@ -116,17 +117,17 @@ export default function QueensDailyPage() {
       <View style={styles.container}>
         <ScrollView style={styles.scrollContent}>
           <View style={styles.content}>
-            <Link href="/games/queens" style={styles.backLink}>
+            <Link href="/games/tango" style={styles.backLink}>
               <Text style={styles.backText}>← Back</Text>
             </Link>
 
-            <Text style={styles.title}>Today's Queens Puzzle</Text>
+            <Text style={styles.title}>Today's Tango Puzzle</Text>
 
             <View style={styles.streakContainer}>
               <StreakBadge current={streak.current} />
             </View>
 
-            <QueensBoard puzzle={puzzle} mode="daily" onComplete={handleComplete} />
+            <TangoBoard puzzle={puzzle} mode="daily" onComplete={handleComplete} />
 
             <ScoreCard
               visible={showScore}
