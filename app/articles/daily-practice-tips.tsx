@@ -217,7 +217,7 @@ export default function DailyPracticeTipsArticle() {
               <Text style={styles.bullet}>• 50-70% improvement in solving speed</Text>
               <Text style={styles.bullet}>• Dramatically reduced hint usage</Text>
               <Text style={styles.bullet}>• Automatic pattern recognition for common scenarios</Text>
-              <Text style={styles.bullet">• Confidence to tackle any board size</Text>
+              <Text style={styles.bullet}>• Confidence to tackle any board size</Text>
               <Text style={styles.bullet}>• Natural enjoyment of daily puzzle-solving</Text>
             </View>
             <Text style={styles.paragraph}>
