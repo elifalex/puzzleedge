@@ -87,11 +87,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'transparent',
+    pointerEvents: 'auto' as any,
   },
   hiddenContainer: {
     width: '100%',
     height: 0,
     overflow: 'hidden',
     opacity: 0,
+    pointerEvents: 'none' as any,
   },
 });
