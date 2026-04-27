@@ -6,6 +6,8 @@ import { QueensBoard } from '../../../src/components/puzzles/QueensBoard';
 import { PuzzleNavigator } from '../../../src/components/ui/PuzzleNavigator';
 import { PuzzleSelector } from '../../../src/components/ui/PuzzleSelector';
 import { ScoreCard } from '../../../src/components/ui/ScoreCard';
+import { AdBanner } from '../../../src/components/ads/AdBanner';
+import { getAdSlot } from '../../../src/config/ads';
 import { BoardSize, getPuzzleByIndex, getPuzzleCount } from '../../../src/data/queensPuzzleLoader';
 import { QueensPuzzle } from '../../../src/constants/types';
 import { useGameStore } from '../../../src/store/gameStore';
@@ -35,12 +37,12 @@ export default function QueensPracticePage() {
     loadPuzzleData(boardSize, initialIndex);
   }, [boardSize, initialIndex]);
 
-  // Auto-scroll to board on mobile after countdown (3.5 seconds)
+  // Auto-scroll to board on mobile immediately
   useEffect(() => {
     const isMobile = Dimensions.get('window').width < 768;
 
     if (isMobile && !loading && puzzle && boardContainerRef.current) {
-      // Wait for countdown to finish (3s) + small buffer (0.5s)
+      // Small delay to allow layout to render
       const scrollTimer = setTimeout(() => {
         boardContainerRef.current?.measureLayout(
           scrollViewRef.current as any,
@@ -52,7 +54,7 @@ export default function QueensPracticePage() {
           },
           () => {} // error callback
         );
-      }, 3500);
+      }, 100);
 
       return () => clearTimeout(scrollTimer);
     }
@@ -134,67 +136,80 @@ export default function QueensPracticePage() {
   const isCompleted = isPuzzleCompleted(boardSize, puzzle.id);
 
   return (
-    <ScrollView ref={scrollViewRef} style={styles.container}>
-      <View style={styles.content}>
-        <Link href="/games/queens/practice" style={styles.backLink}>
-          <Text style={styles.backText}>← Back to Categories</Text>
-        </Link>
+    <View style={styles.wrapper}>
+      <ScrollView ref={scrollViewRef} style={styles.container}>
+        <View style={styles.content}>
+          <Link href="/games/queens/practice" style={styles.backLink}>
+            <Text style={styles.backText}>← Back to Categories</Text>
+          </Link>
 
-        <Text style={styles.title}>Queens Practice</Text>
+          <Text style={styles.title}>Queens Practice</Text>
 
-        <View style={styles.infoBar}>
-          <PuzzleNavigator
-            currentIndex={currentIndex}
-            totalPuzzles={totalPuzzles}
-            onPrevious={handlePreviousPuzzle}
-            onNext={handleNextPuzzle}
-          />
+          <View style={styles.infoBar}>
+            <PuzzleNavigator
+              currentIndex={currentIndex}
+              totalPuzzles={totalPuzzles}
+              onPrevious={handlePreviousPuzzle}
+              onNext={handleNextPuzzle}
+            />
 
-          <Pressable onPress={() => setShowSelector(true)} style={styles.gridButton}>
-            <Grid3x3 size={18} color="#4F6EF7" />
-            <Text style={styles.gridButtonText}>All Puzzles</Text>
-          </Pressable>
-        </View>
-
-        {isCompleted && (
-          <View style={styles.completedBadge}>
-            <Text style={styles.completedText}>✓ Completed</Text>
+            <Pressable onPress={() => setShowSelector(true)} style={styles.gridButton}>
+              <Grid3x3 size={18} color="#4F6EF7" />
+              <Text style={styles.gridButtonText}>All Puzzles</Text>
+            </Pressable>
           </View>
-        )}
 
-        <View ref={boardContainerRef}>
-          <QueensBoard key={puzzle.id} puzzle={puzzle} mode="practice" onComplete={handleComplete} />
-        </View>
+          {isCompleted && (
+            <View style={styles.completedBadge}>
+              <Text style={styles.completedText}>✓ Completed</Text>
+            </View>
+          )}
 
-        <ScoreCard
-          visible={showScore}
-          time={completionTime}
-          onNext={currentIndex < totalPuzzles - 1 ? handleScoreNext : undefined}
-          onClose={() => setShowScore(false)}
-        />
+          <View ref={boardContainerRef}>
+            <QueensBoard key={puzzle.id} puzzle={puzzle} mode="practice" onComplete={handleComplete} />
+          </View>
 
-        {showSelector && (
-          <PuzzleSelector
-            boardSize={boardSize}
-            totalPuzzles={totalPuzzles}
-            currentIndex={currentIndex}
-            completedPuzzleIds={completedIds}
-            onSelectPuzzle={handleSelectPuzzle}
-            onClose={() => setShowSelector(false)}
+          <ScoreCard
+            visible={showScore}
+            time={completionTime}
+            onNext={currentIndex < totalPuzzles - 1 ? handleScoreNext : undefined}
+            onClose={() => setShowScore(false)}
           />
-        )}
-      </View>
-    </ScrollView>
+
+          {showSelector && (
+            <PuzzleSelector
+              boardSize={boardSize}
+              totalPuzzles={totalPuzzles}
+              currentIndex={currentIndex}
+              completedPuzzleIds={completedIds}
+              onSelectPuzzle={handleSelectPuzzle}
+              onClose={() => setShowSelector(false)}
+            />
+          )}
+        </View>
+      </ScrollView>
+      <AdBanner adSlot={getAdSlot('practicePuzzleBanner')} style={styles.stickyAd} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  wrapper: {
     flex: 1,
     backgroundColor: '#0A0A0F',
   },
+  container: {
+    flex: 1,
+  },
   content: {
     padding: 32,
+    paddingBottom: 120, // Extra padding for sticky ad
+  },
+  stickyAd: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   backLink: {
     marginBottom: 32,
