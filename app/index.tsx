@@ -1,4 +1,4 @@
-import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet, Image } from 'react-native';
 import { Link } from 'expo-router';
 import { SEO } from '../src/components/SEO';
 import { AdBanner } from '../src/components/ads/AdBanner';
@@ -27,7 +27,11 @@ export default function HomePage() {
           <View style={styles.content}>
             {/* Hero Section */}
             <View style={styles.hero}>
-              <Text style={styles.title}>PuzzleEdge</Text>
+              <Image
+                source={require('../assets/puzzleedge_logo3.png')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
               <Text style={styles.subtitle}>
                 Master LinkedIn's Daily Queens Puzzle with Unlimited Practice
               </Text>
@@ -120,6 +124,13 @@ const styles = StyleSheet.create({
     maxWidth: 896,
     width: '100%',
     marginBottom: 48,
+  },
+  logo: {
+    width: '100%',
+    maxWidth: 400,
+    height: 120,
+    alignSelf: 'center',
+    marginBottom: 24,
   },
   title: {
     fontSize: 36,
