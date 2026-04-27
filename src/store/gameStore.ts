@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
 import { Platform } from 'react-native';
 import { GameScore, GameStreak, DailyCompletion } from '../constants/types';
 import { BoardSize } from '../data/queensPuzzleLoader';
@@ -24,22 +25,56 @@ interface GameStore {
   getCompletedPuzzleIds: (boardSize: BoardSize) => string[];
 }
 
-// Simple localStorage implementation for web
-const webStorage = {
-  getItem: (name: string) => {
-    try {
-      return localStorage.getItem(name);
-    } catch {
-      return null;
-    }
-  },
-  setItem: (name: string, value: string) => {
-    try {
-      localStorage.setItem(name, value);
-    } catch {
-      // Ignore storage errors
-    }
-  },
+// Custom storage with better error handling and logging
+const createWebStorage = (): StateStorage => {
+  return {
+    getItem: (name: string): string | null => {
+      try {
+        const value = localStorage.getItem(name);
+        if (value) {
+          console.log('[PuzzleEdge Storage] Successfully loaded data from localStorage');
+        }
+        return value;
+      } catch (error) {
+        console.error('[PuzzleEdge Storage] Error reading from localStorage:', error);
+        // Try to fallback to sessionStorage
+        try {
+          const value = sessionStorage.getItem(name);
+          if (value) {
+            console.log('[PuzzleEdge Storage] Loaded data from sessionStorage fallback');
+          }
+          return value;
+        } catch (fallbackError) {
+          console.error('[PuzzleEdge Storage] SessionStorage fallback also failed:', fallbackError);
+          return null;
+        }
+      }
+    },
+    setItem: (name: string, value: string): void => {
+      try {
+        localStorage.setItem(name, value);
+        console.log('[PuzzleEdge Storage] Successfully saved data to localStorage');
+      } catch (error) {
+        console.error('[PuzzleEdge Storage] Error writing to localStorage:', error);
+        // Try to fallback to sessionStorage
+        try {
+          sessionStorage.setItem(name, value);
+          console.log('[PuzzleEdge Storage] Saved data to sessionStorage fallback');
+        } catch (fallbackError) {
+          console.error('[PuzzleEdge Storage] SessionStorage fallback also failed:', fallbackError);
+          console.warn('[PuzzleEdge Storage] Your progress may not be saved. Check browser privacy settings.');
+        }
+      }
+    },
+    removeItem: (name: string): void => {
+      try {
+        localStorage.removeItem(name);
+        sessionStorage.removeItem(name);
+      } catch (error) {
+        console.error('[PuzzleEdge Storage] Error removing from storage:', error);
+      }
+    },
+  };
 };
 
 const storeImpl = (set: any, get: any) => ({
@@ -61,11 +96,6 @@ const storeImpl = (set: any, get: any) => ({
       },
     }));
     get().updateStreak(gameType);
-
-    // Manual persistence for web
-    if (Platform.OS === 'web') {
-      webStorage.setItem('puzzleedge-storage', JSON.stringify(get()));
-    }
   },
 
   updateStreak: (gameType: string) => {
@@ -90,11 +120,6 @@ const storeImpl = (set: any, get: any) => ({
         },
       },
     }));
-
-    // Manual persistence for web
-    if (Platform.OS === 'web') {
-      webStorage.setItem('puzzleedge-storage', JSON.stringify(get()));
-    }
   },
 
   addScore: (gameType: string, score: GameScore) => {
@@ -104,11 +129,6 @@ const storeImpl = (set: any, get: any) => ({
         [gameType]: [...(state.scores[gameType] || []), score],
       },
     }));
-
-    // Manual persistence for web
-    if (Platform.OS === 'web') {
-      webStorage.setItem('puzzleedge-storage', JSON.stringify(get()));
-    }
   },
 
   getDailyCompletion: (gameType: string, date: string) => {
@@ -147,10 +167,7 @@ const storeImpl = (set: any, get: any) => ({
       }
     });
 
-    // Manual persistence for web
-    if (Platform.OS === 'web') {
-      webStorage.setItem('puzzleedge-storage', JSON.stringify(get()));
-    }
+    console.log(`[PuzzleEdge] Marked puzzle ${puzzleId} as complete`);
   },
 
   isPuzzleCompleted: (boardSize: BoardSize, puzzleId: string) => {
@@ -166,28 +183,48 @@ const storeImpl = (set: any, get: any) => ({
   },
 });
 
-// Initialize store with persisted data on web
-const getInitialState = () => {
-  if (Platform.OS === 'web') {
-    try {
-      const stored = webStorage.getItem('puzzleedge-storage');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return {
-          dailyCompletions: parsed.dailyCompletions || {},
-          streaks: parsed.streaks || {},
-          scores: parsed.scores || {},
-          completedPuzzles: parsed.completedPuzzles || {},
-        };
-      }
-    } catch {
-      // Ignore parsing errors
-    }
-  }
-  return {};
-};
+export const useGameStore = create<GameStore>()(
+  Platform.OS === 'web'
+    ? persist(
+        storeImpl,
+        {
+          name: 'puzzleedge-game-storage',
+          storage: createJSONStorage(() => createWebStorage()),
+          version: 1,
+          // Migrate from old localStorage format if it exists
+          migrate: (persistedState: any, version: number) => {
+            console.log('[PuzzleEdge Storage] Migrating storage, version:', version);
 
-export const useGameStore = create<GameStore>()((set, get) => ({
-  ...getInitialState(),
-  ...storeImpl(set, get),
-}));
+            // Check for old format data
+            try {
+              const oldData = localStorage.getItem('puzzleedge-storage');
+              if (oldData && !persistedState) {
+                console.log('[PuzzleEdge Storage] Found old format data, migrating...');
+                const parsed = JSON.parse(oldData);
+                return {
+                  dailyCompletions: parsed.dailyCompletions || {},
+                  streaks: parsed.streaks || {},
+                  scores: parsed.scores || {},
+                  completedPuzzles: parsed.completedPuzzles || {},
+                };
+              }
+            } catch (error) {
+              console.error('[PuzzleEdge Storage] Error migrating old data:', error);
+            }
+
+            return persistedState as GameStore;
+          },
+          onRehydrateStorage: () => {
+            console.log('[PuzzleEdge Storage] Starting hydration...');
+            return (state, error) => {
+              if (error) {
+                console.error('[PuzzleEdge Storage] Hydration error:', error);
+              } else {
+                console.log('[PuzzleEdge Storage] Hydration complete, loaded state:', state);
+              }
+            };
+          },
+        }
+      )
+    : storeImpl
+);

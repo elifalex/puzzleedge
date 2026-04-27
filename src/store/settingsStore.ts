@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
 import { Platform } from 'react-native';
 import { Difficulty } from '../constants/gameConfig';
 
@@ -13,79 +14,130 @@ interface SettingsStore {
   resetHints: (gameType: string) => void;
 }
 
-// Simple localStorage implementation for web
-const webStorage = {
-  getItem: (name: string) => {
-    try {
-      return localStorage.getItem(name);
-    } catch {
-      return null;
-    }
-  },
-  setItem: (name: string, value: string) => {
-    try {
-      localStorage.setItem(name, value);
-    } catch {
-      // Ignore storage errors
-    }
-  },
-};
-
-const persistState = (get: any) => {
-  if (Platform.OS === 'web') {
-    webStorage.setItem('puzzleedge-settings', JSON.stringify(get()));
-  }
-};
-
-// Initialize store with persisted data on web
-const getInitialState = () => {
-  if (Platform.OS === 'web') {
-    try {
-      const stored = webStorage.getItem('puzzleedge-settings');
-      if (stored) {
-        return JSON.parse(stored);
-      }
-    } catch {
-      // Ignore parsing errors
-    }
-  }
+// Custom storage with better error handling and logging
+const createWebStorage = (): StateStorage => {
   return {
-    soundEnabled: true,
-    preferredDifficulty: 'medium' as Difficulty,
-    hintsRemaining: {},
+    getItem: (name: string): string | null => {
+      try {
+        const value = localStorage.getItem(name);
+        if (value) {
+          console.log('[PuzzleEdge Settings] Successfully loaded settings from localStorage');
+        }
+        return value;
+      } catch (error) {
+        console.error('[PuzzleEdge Settings] Error reading from localStorage:', error);
+        // Try to fallback to sessionStorage
+        try {
+          const value = sessionStorage.getItem(name);
+          if (value) {
+            console.log('[PuzzleEdge Settings] Loaded settings from sessionStorage fallback');
+          }
+          return value;
+        } catch (fallbackError) {
+          console.error('[PuzzleEdge Settings] SessionStorage fallback also failed:', fallbackError);
+          return null;
+        }
+      }
+    },
+    setItem: (name: string, value: string): void => {
+      try {
+        localStorage.setItem(name, value);
+        console.log('[PuzzleEdge Settings] Successfully saved settings to localStorage');
+      } catch (error) {
+        console.error('[PuzzleEdge Settings] Error writing to localStorage:', error);
+        // Try to fallback to sessionStorage
+        try {
+          sessionStorage.setItem(name, value);
+          console.log('[PuzzleEdge Settings] Saved settings to sessionStorage fallback');
+        } catch (fallbackError) {
+          console.error('[PuzzleEdge Settings] SessionStorage fallback also failed:', fallbackError);
+        }
+      }
+    },
+    removeItem: (name: string): void => {
+      try {
+        localStorage.removeItem(name);
+        sessionStorage.removeItem(name);
+      } catch (error) {
+        console.error('[PuzzleEdge Settings] Error removing from storage:', error);
+      }
+    },
   };
 };
 
-export const useSettingsStore = create<SettingsStore>()((set, get) => ({
-  ...getInitialState(),
+const storeImpl = (set: any) => ({
+  soundEnabled: true,
+  preferredDifficulty: 'medium' as Difficulty,
+  hintsRemaining: {},
 
-  setSoundEnabled: (enabled) => {
+  setSoundEnabled: (enabled: boolean) => {
     set({ soundEnabled: enabled });
-    persistState(get);
   },
 
-  setPreferredDifficulty: (difficulty) => {
+  setPreferredDifficulty: (difficulty: Difficulty) => {
     set({ preferredDifficulty: difficulty });
-    persistState(get);
   },
 
-  useHint: (gameType) => {
-    set((state) => ({
+  useHint: (gameType: string) => {
+    set((state: SettingsStore) => ({
       hintsRemaining: {
         ...state.hintsRemaining,
         [gameType]: Math.max(0, (state.hintsRemaining[gameType] || 3) - 1),
       },
     }));
-    persistState(get);
   },
 
-  resetHints: (gameType) => {
-    set((state) => ({
+  resetHints: (gameType: string) => {
+    set((state: SettingsStore) => ({
       hintsRemaining: {
         ...state.hintsRemaining,
         [gameType]: 3,
       },
     }));
-    persistState(get);
   },
-}));
+});
+
+export const useSettingsStore = create<SettingsStore>()(
+  Platform.OS === 'web'
+    ? persist(
+        storeImpl,
+        {
+          name: 'puzzleedge-settings-storage',
+          storage: createJSONStorage(() => createWebStorage()),
+          version: 1,
+          // Migrate from old localStorage format if it exists
+          migrate: (persistedState: any, version: number) => {
+            console.log('[PuzzleEdge Settings] Migrating settings, version:', version);
+
+            // Check for old format data
+            try {
+              const oldData = localStorage.getItem('puzzleedge-settings');
+              if (oldData && !persistedState) {
+                console.log('[PuzzleEdge Settings] Found old format data, migrating...');
+                const parsed = JSON.parse(oldData);
+                return {
+                  soundEnabled: parsed.soundEnabled !== undefined ? parsed.soundEnabled : true,
+                  preferredDifficulty: parsed.preferredDifficulty || 'medium',
+                  hintsRemaining: parsed.hintsRemaining || {},
+                };
+              }
+            } catch (error) {
+              console.error('[PuzzleEdge Settings] Error migrating old data:', error);
+            }
+
+            return persistedState as SettingsStore;
+          },
+          onRehydrateStorage: () => {
+            console.log('[PuzzleEdge Settings] Starting hydration...');
+            return (state, error) => {
+              if (error) {
+                console.error('[PuzzleEdge Settings] Hydration error:', error);
+              } else {
+                console.log('[PuzzleEdge Settings] Hydration complete');
+              }
+            };
+          },
+        }
+      )
+    : storeImpl
+);
