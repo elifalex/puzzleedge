@@ -1,5 +1,5 @@
 import { View, StyleSheet, Platform } from 'react-native';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface AdBannerProps {
   adSlot: string; // Your AdSense ad slot ID
@@ -12,6 +12,7 @@ interface AdBannerProps {
  */
 export function AdBanner({ adSlot, style }: AdBannerProps) {
   const containerRef = useRef<any>(null);
+  const [isAdLoaded, setIsAdLoaded] = useState(false);
 
   useEffect(() => {
     if (Platform.OS === 'web' && typeof window !== 'undefined') {
@@ -38,6 +39,16 @@ export function AdBanner({ adSlot, style }: AdBannerProps) {
               // @ts-ignore
               (window.adsbygoogle = window.adsbygoogle || []).push({});
               console.log('[AdSense] Ad unit initialized:', adSlot);
+
+              // Check if ad loaded successfully after a delay
+              setTimeout(() => {
+                if (ins.getAttribute('data-ad-status') === 'filled' || ins.offsetHeight > 0) {
+                  setIsAdLoaded(true);
+                  console.log('[AdSense] Ad loaded successfully');
+                } else {
+                  console.log('[AdSense] No ad served (pending approval or no fill)');
+                }
+              }, 1000);
             } catch (e) {
               console.error('[AdSense] Error initializing ad:', e);
             }
@@ -54,9 +65,18 @@ export function AdBanner({ adSlot, style }: AdBannerProps) {
     return null;
   }
 
+  // Don't render container if no ad loaded (prevents empty space)
+  if (!isAdLoaded && Platform.OS === 'web') {
+    return (
+      <View style={[styles.hiddenContainer, style]}>
+        <div ref={containerRef} style={{ width: '100%', minHeight: '0px' }} />
+      </View>
+    );
+  }
+
   return (
     <View style={[styles.container, style]}>
-      <div ref={containerRef} style={{ width: '100%', minHeight: '50px' }} />
+      <div ref={containerRef} style={{ width: '100%' }} />
     </View>
   );
 }
@@ -64,10 +84,14 @@ export function AdBanner({ adSlot, style }: AdBannerProps) {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    minHeight: 50,
-    maxHeight: 100,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#13131A',
+    backgroundColor: 'transparent',
+  },
+  hiddenContainer: {
+    width: '100%',
+    height: 0,
+    overflow: 'hidden',
+    opacity: 0,
   },
 });
