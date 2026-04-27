@@ -1,4 +1,4 @@
-import { View, Text, Pressable, Image, StyleSheet, Platform } from 'react-native';
+import { View, Text, Pressable, Image, StyleSheet, Platform, useWindowDimensions } from 'react-native';
 import { Link, usePathname } from 'expo-router';
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react-native';
@@ -6,6 +6,8 @@ import { Menu, X } from 'lucide-react-native';
 export function Header() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { width } = useWindowDimensions();
+  const isMobile = width < 769;
 
   const isActive = (path: string) => {
     if (path === '/' && pathname === '/') return true;
@@ -28,55 +30,59 @@ export function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <View style={styles.desktopNav}>
-          <Link href="/" asChild>
-            <Pressable style={styles.navLink}>
-              <Text style={[styles.navLinkText, isActive('/') && styles.navLinkActive]}>
-                Home
-              </Text>
-            </Pressable>
-          </Link>
+        {!isMobile && (
+          <View style={styles.desktopNav}>
+            <Link href="/" asChild>
+              <Pressable style={styles.navLink}>
+                <Text style={[styles.navLinkText, isActive('/') && styles.navLinkActive]}>
+                  Home
+                </Text>
+              </Pressable>
+            </Link>
 
-          <Link href="/games/queens" asChild>
-            <Pressable style={styles.navLink}>
-              <Text style={[styles.navLinkText, isActive('/games/queens') && styles.navLinkActive]}>
-                Queens Game
-              </Text>
-            </Pressable>
-          </Link>
+            <Link href="/games/queens" asChild>
+              <Pressable style={styles.navLink}>
+                <Text style={[styles.navLinkText, isActive('/games/queens') && styles.navLinkActive]}>
+                  Queens
+                </Text>
+              </Pressable>
+            </Link>
 
-          <Link href="/how-to-play/queens" asChild>
-            <Pressable style={styles.navLink}>
-              <Text style={[styles.navLinkText, isActive('/how-to-play') && styles.navLinkActive]}>
-                How to Play
-              </Text>
-            </Pressable>
-          </Link>
+            <Link href="/games/tango" asChild>
+              <Pressable style={styles.navLink}>
+                <Text style={[styles.navLinkText, isActive('/games/tango') && styles.navLinkActive]}>
+                  Tango
+                </Text>
+              </Pressable>
+            </Link>
 
-          <Link href="/articles" asChild>
-            <Pressable style={styles.navLink}>
-              <Text style={[styles.navLinkText, isActive('/articles') && styles.navLinkActive]}>
-                Articles
-              </Text>
-            </Pressable>
-          </Link>
-        </View>
+            <Link href="/articles" asChild>
+              <Pressable style={styles.navLink}>
+                <Text style={[styles.navLinkText, isActive('/articles') && styles.navLinkActive]}>
+                  Articles
+                </Text>
+              </Pressable>
+            </Link>
+          </View>
+        )}
 
         {/* Mobile Menu Button */}
-        <Pressable
-          style={styles.mobileMenuButton}
-          onPress={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? (
-            <X size={24} color="#F0F0F8" />
-          ) : (
-            <Menu size={24} color="#F0F0F8" />
-          )}
-        </Pressable>
+        {isMobile && (
+          <Pressable
+            style={styles.mobileMenuButton}
+            onPress={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? (
+              <X size={24} color="#F0F0F8" />
+            ) : (
+              <Menu size={24} color="#F0F0F8" />
+            )}
+          </Pressable>
+        )}
       </View>
 
       {/* Mobile Menu */}
-      {mobileMenuOpen && (
+      {isMobile && mobileMenuOpen && (
         <View style={styles.mobileMenu}>
           <Link href="/" asChild>
             <Pressable
@@ -100,13 +106,13 @@ export function Header() {
             </Pressable>
           </Link>
 
-          <Link href="/how-to-play/queens" asChild>
+          <Link href="/games/tango" asChild>
             <Pressable
               style={styles.mobileNavLink}
               onPress={() => setMobileMenuOpen(false)}
             >
-              <Text style={[styles.mobileNavLinkText, isActive('/how-to-play') && styles.mobileNavLinkActive]}>
-                How to Play
+              <Text style={[styles.mobileNavLinkText, isActive('/games/tango') && styles.mobileNavLinkActive]}>
+                Tango Game
               </Text>
             </Pressable>
           </Link>
@@ -162,16 +168,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    ...Platform.select({
-      web: {
-        '@media (max-width: 768px)': {
-          display: 'none',
-        },
-      },
-      default: {
-        display: 'none',
-      },
-    }),
   },
   navLink: {
     paddingHorizontal: 16,
@@ -188,22 +184,19 @@ const styles = StyleSheet.create({
   },
   mobileMenuButton: {
     padding: 8,
-    ...Platform.select({
-      web: {
-        '@media (min-width: 769px)': {
-          display: 'none',
-        },
-      },
-      default: {
-        display: 'flex',
-      },
-    }),
+    zIndex: 1100,
   },
   mobileMenu: {
     backgroundColor: '#13131A',
     borderTopWidth: 1,
     borderTopColor: '#2A2A3D',
     paddingVertical: 8,
+    ...Platform.select({
+      web: {
+        position: 'relative' as any,
+        zIndex: 1050,
+      },
+    }),
   },
   mobileNavLink: {
     paddingHorizontal: 24,
