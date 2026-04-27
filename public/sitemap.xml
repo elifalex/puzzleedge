@@ -44,4 +44,52 @@
     <lastmod>2026-04-24</lastmod>
   </url>
 
+  <!-- Articles Index -->
+  <url>
+    <loc>https://puzzleedge.app/articles</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-04-27</lastmod>
+  </url>
+
+  <!-- Article: Beginner's Guide to LinkedIn Queens Puzzle -->
+  <url>
+    <loc>https://puzzleedge.app/articles/beginners-guide</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-04-27</lastmod>
+  </url>
+
+  <!-- Article: Advanced Queens Puzzle Strategies -->
+  <url>
+    <loc>https://puzzleedge.app/articles/advanced-strategies</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-04-27</lastmod>
+  </url>
+
+  <!-- Article: Common Queens Puzzle Mistakes -->
+  <url>
+    <loc>https://puzzleedge.app/articles/common-mistakes</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2026-04-27</lastmod>
+  </url>
+
+  <!-- Article: Daily Practice Tips -->
+  <url>
+    <loc>https://puzzleedge.app/articles/daily-practice-tips</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2026-04-27</lastmod>
+  </url>
+
+  <!-- Article: Queens Puzzle Rules Explained -->
+  <url>
+    <loc>https://puzzleedge.app/articles/rules-explained</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2026-04-27</lastmod>
+  </url>
+
 </urlset>

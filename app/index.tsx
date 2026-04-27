@@ -84,6 +84,40 @@ export default function HomePage() {
               </View>
             </View>
 
+            {/* Articles Section */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Learn & Improve</Text>
+              <Text style={styles.sectionSubtitle}>
+                Expert guides and strategies to master LinkedIn Queens puzzles
+              </Text>
+
+              <Link href="/articles/beginners-guide" asChild>
+                <Pressable style={styles.articleCard}>
+                  <Text style={styles.articleTitle}>Ultimate Beginner's Guide to Queens Puzzle</Text>
+                  <Text style={styles.articleDescription}>
+                    Learn everything you need to start solving Queens puzzles like a pro
+                  </Text>
+                  <Text style={styles.readMore}>Read Article →</Text>
+                </Pressable>
+              </Link>
+
+              <Link href="/articles/advanced-strategies" asChild>
+                <Pressable style={styles.articleCard}>
+                  <Text style={styles.articleTitle}>10 Advanced Queens Puzzle Strategies</Text>
+                  <Text style={styles.articleDescription}>
+                    Expert techniques to solve puzzles faster and more efficiently
+                  </Text>
+                  <Text style={styles.readMore}>Read Article →</Text>
+                </Pressable>
+              </Link>
+
+              <Link href="/articles" asChild>
+                <Pressable style={styles.viewAllButton}>
+                  <Text style={styles.viewAllText}>View All Articles →</Text>
+                </Pressable>
+              </Link>
+            </View>
+
             {/* Footer Disclaimer */}
             <View style={styles.footer}>
               <Text style={styles.disclaimer}>
@@ -161,6 +195,51 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#F0F0F8',
     marginBottom: 16,
+  },
+  sectionSubtitle: {
+    fontSize: 16,
+    color: '#8888AA',
+    marginBottom: 20,
+  },
+  articleCard: {
+    backgroundColor: '#1C1C27',
+    padding: 20,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#2A2A3D',
+    marginBottom: 12,
+  },
+  articleTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#F0F0F8',
+    marginBottom: 8,
+  },
+  articleDescription: {
+    fontSize: 14,
+    color: '#8888AA',
+    marginBottom: 12,
+    lineHeight: 20,
+  },
+  readMore: {
+    fontSize: 14,
+    color: '#4F6EF7',
+    fontWeight: '600',
+  },
+  viewAllButton: {
+    backgroundColor: '#13131A',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#4F6EF7',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  viewAllText: {
+    color: '#4F6EF7',
+    fontSize: 15,
+    fontWeight: '600',
   },
   card: {
     backgroundColor: '#13131A',
