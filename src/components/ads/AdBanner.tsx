@@ -9,25 +9,45 @@ interface AdBannerProps {
 /**
  * Sticky Bottom Banner Ad Component
  * Uses Google AdSense for web monetization
- *
- * Setup:
- * 1. Get AdSense account approved
- * 2. Create ad unit and get ad slot ID
- * 3. Add AdSense script to app/_layout.tsx or index.html
  */
 export function AdBanner({ adSlot, style }: AdBannerProps) {
-  const adRef = useRef<View>(null);
+  const containerRef = useRef<any>(null);
 
   useEffect(() => {
     if (Platform.OS === 'web' && typeof window !== 'undefined') {
       try {
-        // @ts-ignore - AdSense global
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        // Create and inject the ad element directly into the DOM
+        const adContainer = containerRef.current;
+        if (adContainer && adContainer instanceof HTMLElement) {
+          // Create the ins element
+          const ins = document.createElement('ins');
+          ins.className = 'adsbygoogle';
+          ins.style.display = 'block';
+          ins.setAttribute('data-ad-client', 'ca-pub-6082551497006632');
+          ins.setAttribute('data-ad-slot', adSlot);
+          ins.setAttribute('data-ad-format', 'auto');
+          ins.setAttribute('data-full-width-responsive', 'true');
+
+          // Clear any existing content and append the ins element
+          adContainer.innerHTML = '';
+          adContainer.appendChild(ins);
+
+          // Push to AdSense
+          setTimeout(() => {
+            try {
+              // @ts-ignore
+              (window.adsbygoogle = window.adsbygoogle || []).push({});
+              console.log('[AdSense] Ad unit initialized:', adSlot);
+            } catch (e) {
+              console.error('[AdSense] Error initializing ad:', e);
+            }
+          }, 100);
+        }
       } catch (e) {
-        console.error('AdSense error:', e);
+        console.error('[AdSense] Error setting up ad container:', e);
       }
     }
-  }, []);
+  }, [adSlot]);
 
   // Only show ads on web
   if (Platform.OS !== 'web') {
@@ -35,17 +55,8 @@ export function AdBanner({ adSlot, style }: AdBannerProps) {
   }
 
   return (
-    <View style={[styles.container, style]} ref={adRef}>
-      <ins
-        className="adsbygoogle"
-        style={{
-          display: 'block',
-        }}
-        data-ad-client="ca-pub-6082551497006632"
-        data-ad-slot={adSlot}
-        data-ad-format="auto"
-        data-full-width-responsive="true"
-      />
+    <View style={[styles.container, style]}>
+      <div ref={containerRef} style={{ width: '100%', minHeight: '50px' }} />
     </View>
   );
 }
