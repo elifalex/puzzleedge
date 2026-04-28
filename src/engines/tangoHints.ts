@@ -33,14 +33,14 @@ export function getIntelligentHint(
       // If only one value is valid
       if (sunConflicts.length === 0 && moonConflicts.length > 0) {
         return {
-          message: `Cell (${row + 1}, ${col + 1}) must be a sun ☀️`,
+          message: `Cell (row ${row + 1}, col ${col + 1}) must be a Sun - it's the only valid option here`,
           highlightCells: [[row, col]],
           suggestedValue: 0,
           cell: [row, col],
         };
       } else if (moonConflicts.length === 0 && sunConflicts.length > 0) {
         return {
-          message: `Cell (${row + 1}, ${col + 1}) must be a moon 🌑`,
+          message: `Cell (row ${row + 1}, col ${col + 1}) must be a Moon - it's the only valid option here`,
           highlightCells: [[row, col]],
           suggestedValue: 1,
           cell: [row, col],
@@ -61,7 +61,7 @@ export function getIntelligentHint(
     if (val1 !== null && val2 === null) {
       if (constraint.type === 'equal') {
         return {
-          message: `These cells must match (=). Since (${r1 + 1}, ${c1 + 1}) is ${val1 === 0 ? 'sun ☀️' : 'moon 🌑'}, (${r2 + 1}, ${c2 + 1}) must also be ${val1 === 0 ? 'sun ☀️' : 'moon 🌑'}`,
+          message: `Constraint (=): Cell (row ${r2 + 1}, col ${c2 + 1}) must be ${val1 === 0 ? 'Sun' : 'Moon'} to match (row ${r1 + 1}, col ${c1 + 1})`,
           highlightCells: [[r1, c1], [r2, c2]],
           suggestedValue: val1 as 0 | 1,
           cell: [r2, c2],
@@ -69,7 +69,7 @@ export function getIntelligentHint(
       } else {
         const oppositeValue = val1 === 0 ? 1 : 0;
         return {
-          message: `These cells must differ (×). Since (${r1 + 1}, ${c1 + 1}) is ${val1 === 0 ? 'sun ☀️' : 'moon 🌑'}, (${r2 + 1}, ${c2 + 1}) must be ${oppositeValue === 0 ? 'sun ☀️' : 'moon 🌑'}`,
+          message: `Constraint (×): Cell (row ${r2 + 1}, col ${c2 + 1}) must be ${oppositeValue === 0 ? 'Sun' : 'Moon'} - opposite of (row ${r1 + 1}, col ${c1 + 1})`,
           highlightCells: [[r1, c1], [r2, c2]],
           suggestedValue: oppositeValue as 0 | 1,
           cell: [r2, c2],
@@ -78,7 +78,7 @@ export function getIntelligentHint(
     } else if (val2 !== null && val1 === null) {
       if (constraint.type === 'equal') {
         return {
-          message: `These cells must match (=). Since (${r2 + 1}, ${c2 + 1}) is ${val2 === 0 ? 'sun ☀️' : 'moon 🌑'}, (${r1 + 1}, ${c1 + 1}) must also be ${val2 === 0 ? 'sun ☀️' : 'moon 🌑'}`,
+          message: `Constraint (=): Cell (row ${r1 + 1}, col ${c1 + 1}) must be ${val2 === 0 ? 'Sun' : 'Moon'} to match (row ${r2 + 1}, col ${c2 + 1})`,
           highlightCells: [[r1, c1], [r2, c2]],
           suggestedValue: val2 as 0 | 1,
           cell: [r1, c1],
@@ -86,7 +86,7 @@ export function getIntelligentHint(
       } else {
         const oppositeValue = val2 === 0 ? 1 : 0;
         return {
-          message: `These cells must differ (×). Since (${r2 + 1}, ${c2 + 1}) is ${val2 === 0 ? 'sun ☀️' : 'moon 🌑'}, (${r1 + 1}, ${c1 + 1}) must be ${oppositeValue === 0 ? 'sun ☀️' : 'moon 🌑'}`,
+          message: `Constraint (×): Cell (row ${r1 + 1}, col ${c1 + 1}) must be ${oppositeValue === 0 ? 'Sun' : 'Moon'} - opposite of (row ${r2 + 1}, col ${c2 + 1})`,
           highlightCells: [[r1, c1], [r2, c2]],
           suggestedValue: oppositeValue as 0 | 1,
           cell: [r1, c1],
@@ -117,7 +117,7 @@ export function getIntelligentHint(
     // If row needs only suns
     if (moonCount === puzzle.size / 2 && emptyCount > 0) {
       return {
-        message: `Row ${row + 1} already has ${puzzle.size / 2} moons, so remaining cells must be suns ☀️`,
+        message: `Row ${row + 1} already has ${puzzle.size / 2} Moons (max). Place Sun at (row ${row + 1}, col ${emptyCols[0] + 1})`,
         highlightCells: emptyCols.map(col => [row, col] as [number, number]),
         suggestedValue: 0,
         cell: [row, emptyCols[0]],
@@ -127,7 +127,7 @@ export function getIntelligentHint(
     // If row needs only moons
     if (sunCount === puzzle.size / 2 && emptyCount > 0) {
       return {
-        message: `Row ${row + 1} already has ${puzzle.size / 2} suns, so remaining cells must be moons 🌑`,
+        message: `Row ${row + 1} already has ${puzzle.size / 2} Suns (max). Place Moon at (row ${row + 1}, col ${emptyCols[0] + 1})`,
         highlightCells: emptyCols.map(col => [row, col] as [number, number]),
         suggestedValue: 1,
         cell: [row, emptyCols[0]],
@@ -156,7 +156,7 @@ export function getIntelligentHint(
 
     if (moonCount === puzzle.size / 2 && emptyCount > 0) {
       return {
-        message: `Column ${col + 1} already has ${puzzle.size / 2} moons, so remaining cells must be suns ☀️`,
+        message: `Column ${col + 1} already has ${puzzle.size / 2} Moons (max). Place Sun at (row ${emptyRows[0] + 1}, col ${col + 1})`,
         highlightCells: emptyRows.map(row => [row, col] as [number, number]),
         suggestedValue: 0,
         cell: [emptyRows[0], col],
@@ -165,7 +165,7 @@ export function getIntelligentHint(
 
     if (sunCount === puzzle.size / 2 && emptyCount > 0) {
       return {
-        message: `Column ${col + 1} already has ${puzzle.size / 2} suns, so remaining cells must be moons 🌑`,
+        message: `Column ${col + 1} already has ${puzzle.size / 2} Suns (max). Place Moon at (row ${emptyRows[0] + 1}, col ${col + 1})`,
         highlightCells: emptyRows.map(row => [row, col] as [number, number]),
         suggestedValue: 1,
         cell: [emptyRows[0], col],
@@ -184,7 +184,7 @@ export function getIntelligentHint(
       if (val1 !== null && val1 === val2 && val3 === null) {
         const opposite = val1 === 0 ? 1 : 0;
         return {
-          message: `Cells (${row + 1}, ${col + 1}) and (${row + 1}, ${col + 2}) are both ${val1 === 0 ? 'suns' : 'moons'}, so (${row + 1}, ${col + 3}) must be ${opposite === 0 ? 'sun ☀️' : 'moon 🌑'}`,
+          message: `Two ${val1 === 0 ? 'Suns' : 'Moons'} in a row! Place ${opposite === 0 ? 'Sun' : 'Moon'} at (row ${row + 1}, col ${col + 3}) to avoid three in a row`,
           highlightCells: [[row, col], [row, col + 1], [row, col + 2]],
           suggestedValue: opposite,
           cell: [row, col + 2],
@@ -195,7 +195,7 @@ export function getIntelligentHint(
       if (val2 !== null && val2 === val3 && val1 === null) {
         const opposite = val2 === 0 ? 1 : 0;
         return {
-          message: `Cells (${row + 1}, ${col + 2}) and (${row + 1}, ${col + 3}) are both ${val2 === 0 ? 'suns' : 'moons'}, so (${row + 1}, ${col + 1}) must be ${opposite === 0 ? 'sun ☀️' : 'moon 🌑'}`,
+          message: `Two ${val2 === 0 ? 'Suns' : 'Moons'} in a row! Place ${opposite === 0 ? 'Sun' : 'Moon'} at (row ${row + 1}, col ${col + 1}) to avoid three in a row`,
           highlightCells: [[row, col], [row, col + 1], [row, col + 2]],
           suggestedValue: opposite,
           cell: [row, col],
@@ -206,7 +206,7 @@ export function getIntelligentHint(
       if (val1 !== null && val1 === val3 && val2 === null) {
         const opposite = val1 === 0 ? 1 : 0;
         return {
-          message: `Cells (${row + 1}, ${col + 1}) and (${row + 1}, ${col + 3}) are both ${val1 === 0 ? 'suns' : 'moons'}, so (${row + 1}, ${col + 2}) must be ${opposite === 0 ? 'sun ☀️' : 'moon 🌑'}`,
+          message: `Same ${val1 === 0 ? 'Suns' : 'Moons'} on both sides! Place ${opposite === 0 ? 'Sun' : 'Moon'} at (row ${row + 1}, col ${col + 2}) to avoid three in a row`,
           highlightCells: [[row, col], [row, col + 1], [row, col + 2]],
           suggestedValue: opposite,
           cell: [row, col + 1],
@@ -225,7 +225,7 @@ export function getIntelligentHint(
       if (val1 !== null && val1 === val2 && val3 === null) {
         const opposite = val1 === 0 ? 1 : 0;
         return {
-          message: `Cells (${row + 1}, ${col + 1}) and (${row + 2}, ${col + 1}) are both ${val1 === 0 ? 'suns' : 'moons'}, so (${row + 3}, ${col + 1}) must be ${opposite === 0 ? 'sun ☀️' : 'moon 🌑'}`,
+          message: `Two ${val1 === 0 ? 'Suns' : 'Moons'} vertically! Place ${opposite === 0 ? 'Sun' : 'Moon'} at (row ${row + 3}, col ${col + 1}) to avoid three in a row`,
           highlightCells: [[row, col], [row + 1, col], [row + 2, col]],
           suggestedValue: opposite,
           cell: [row + 2, col],
@@ -235,7 +235,7 @@ export function getIntelligentHint(
       if (val2 !== null && val2 === val3 && val1 === null) {
         const opposite = val2 === 0 ? 1 : 0;
         return {
-          message: `Cells (${row + 2}, ${col + 1}) and (${row + 3}, ${col + 1}) are both ${val2 === 0 ? 'suns' : 'moons'}, so (${row + 1}, ${col + 1}) must be ${opposite === 0 ? 'sun ☀️' : 'moon 🌑'}`,
+          message: `Two ${val2 === 0 ? 'Suns' : 'Moons'} vertically! Place ${opposite === 0 ? 'Sun' : 'Moon'} at (row ${row + 1}, col ${col + 1}) to avoid three in a row`,
           highlightCells: [[row, col], [row + 1, col], [row + 2, col]],
           suggestedValue: opposite,
           cell: [row, col],
@@ -245,7 +245,7 @@ export function getIntelligentHint(
       if (val1 !== null && val1 === val3 && val2 === null) {
         const opposite = val1 === 0 ? 1 : 0;
         return {
-          message: `Cells (${row + 1}, ${col + 1}) and (${row + 3}, ${col + 1}) are both ${val1 === 0 ? 'suns' : 'moons'}, so (${row + 2}, ${col + 1}) must be ${opposite === 0 ? 'sun ☀️' : 'moon 🌑'}`,
+          message: `Same ${val1 === 0 ? 'Suns' : 'Moons'} above and below! Place ${opposite === 0 ? 'Sun' : 'Moon'} at (row ${row + 2}, col ${col + 1}) to avoid three in a row`,
           highlightCells: [[row, col], [row + 1, col], [row + 2, col]],
           suggestedValue: opposite,
           cell: [row + 1, col],

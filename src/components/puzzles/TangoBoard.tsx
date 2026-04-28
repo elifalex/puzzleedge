@@ -1,5 +1,6 @@
 import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
 import { useState, useEffect } from 'react';
+import { Sun, Moon } from 'lucide-react-native';
 import { TangoPuzzle } from '../../constants/types';
 import { validateTangoGrid, isPuzzleComplete } from '../../engines/tangoValidator';
 import { getIntelligentHint } from '../../engines/tangoHints';
@@ -20,6 +21,7 @@ export function TangoBoard({ puzzle, mode, onComplete }: TangoBoardProps) {
   const [countdown, setCountdown] = useState<number | null>(3);
   const [hintCells, setHintCells] = useState<[number, number][]>([]);
   const [hintMessage, setHintMessage] = useState<string | null>(null);
+  const [validationTimer, setValidationTimer] = useState<NodeJS.Timeout | null>(null);
   const { elapsed, start, stop, reset } = useTimer();
 
   // Countdown logic
@@ -35,16 +37,35 @@ export function TangoBoard({ puzzle, mode, onComplete }: TangoBoardProps) {
     }
   }, [countdown]);
 
-  // Validate grid and check for completion
+  // Validate grid with 1-second debounce to allow user to cycle through values
   useEffect(() => {
-    const validation = validateTangoGrid(puzzle, currentGrid);
-    setConflicts(validation.conflicts);
+    // Clear existing validation timer
+    if (validationTimer) {
+      clearTimeout(validationTimer);
+    }
 
-    // Check if puzzle is complete
+    // Set new timer for validation (1 second delay)
+    const timer = setTimeout(() => {
+      const validation = validateTangoGrid(puzzle, currentGrid);
+      setConflicts(validation.conflicts);
+    }, 1000);
+
+    setValidationTimer(timer);
+
+    // Check if puzzle is complete (immediate, no delay)
     if (isPuzzleComplete(puzzle, currentGrid)) {
+      if (validationTimer) {
+        clearTimeout(validationTimer);
+      }
       stop();
       onComplete?.(elapsed);
     }
+
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
   }, [currentGrid]);
 
   const handleCellPress = (row: number, col: number) => {
@@ -95,6 +116,11 @@ export function TangoBoard({ puzzle, mode, onComplete }: TangoBoardProps) {
   };
 
   const handleReset = () => {
+    // Clear validation timer on reset
+    if (validationTimer) {
+      clearTimeout(validationTimer);
+      setValidationTimer(null);
+    }
     setCurrentGrid(puzzle.grid.map(row => [...row]));
     setConflicts(new Set());
     setHintCells([]);
@@ -147,8 +173,8 @@ export function TangoBoard({ puzzle, mode, onComplete }: TangoBoardProps) {
                       isHintCell && styles.cellHint,
                     ]}
                   >
-                    {value === 0 && <Text style={styles.symbol}>☀️</Text>}
-                    {value === 1 && <Text style={styles.symbol}>🌑</Text>}
+                    {value === 0 && <Sun size={28} color="#FCD34D" strokeWidth={2.5} />}
+                    {value === 1 && <Moon size={28} color="#A78BFA" strokeWidth={2.5} />}
                   </Pressable>
                 );
               })}
@@ -214,16 +240,20 @@ export function TangoBoard({ puzzle, mode, onComplete }: TangoBoardProps) {
       {/* Legend */}
       <View style={styles.legend}>
         <View style={styles.legendItem}>
-          <Text style={styles.legendText}>☀️ Sun</Text>
+          <Sun size={16} color="#FCD34D" strokeWidth={2.5} />
+          <Text style={styles.legendText}>Sun</Text>
         </View>
         <View style={styles.legendItem}>
-          <Text style={styles.legendText}>🌑 Moon</Text>
+          <Moon size={16} color="#A78BFA" strokeWidth={2.5} />
+          <Text style={styles.legendText}>Moon</Text>
         </View>
         <View style={styles.legendItem}>
-          <Text style={styles.legendText}>= Same</Text>
+          <Text style={[styles.legendText, styles.legendSymbol]}>=</Text>
+          <Text style={styles.legendText}>Same</Text>
         </View>
         <View style={styles.legendItem}>
-          <Text style={styles.legendText}>× Different</Text>
+          <Text style={[styles.legendText, styles.legendSymbol]}>×</Text>
+          <Text style={styles.legendText}>Different</Text>
         </View>
       </View>
     </View>
@@ -361,11 +391,18 @@ const styles = StyleSheet.create({
     borderColor: '#2A2A3D',
   },
   legendItem: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
   },
   legendText: {
     color: '#8888AA',
     fontSize: 13,
     fontWeight: '600',
+  },
+  legendSymbol: {
+    fontSize: 16,
+    color: '#4F6EF7',
+    fontWeight: '700',
   },
 });
