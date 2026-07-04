@@ -1,4 +1,4 @@
-import { View, Text, Pressable, StyleSheet, Animated } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Animated, ScrollView } from 'react-native';
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, ChevronUp, Check } from 'lucide-react-native';
 import { BoardSize } from '../../data/queensPuzzleLoader';
@@ -41,9 +41,18 @@ export function CategoryCard({
     }).start();
   }, [isExpanded]);
 
+  // Calculate dynamic height based on total puzzles
+  // Puzzle button: 48px height + 8px gap = 56px per row
+  // Puzzles per row: ~7 (assuming ~400px width, 48px + 8px = 56px per puzzle)
+  // Also add: progress bar (~60px) + border (1px) + padding (32px)
+  const puzzlesPerRow = 7;
+  const rowCount = Math.ceil(totalPuzzles / puzzlesPerRow);
+  const puzzleGridHeight = rowCount * 56; // 48px + 8px gap
+  const dynamicMaxHeight = puzzleGridHeight + 100; // +100 for progress bar and padding
+
   const maxHeight = animationHeight.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 2000], // Max height for puzzle grid
+    outputRange: [0, dynamicMaxHeight],
   });
 
   return (
@@ -68,49 +77,55 @@ export function CategoryCard({
 
       {isExpanded && (
         <Animated.View style={[styles.expandedContent, { maxHeight }]}>
-          {/* Progress Bar */}
-          <View style={styles.progressContainer}>
-            <View style={styles.progressBar}>
-              <View
-                style={[
-                  styles.progressFill,
-                  { width: `${progressPercent}%`, backgroundColor: info.color },
-                ]}
-              />
-            </View>
-            <Text style={styles.progressText}>{progressPercent}% Complete</Text>
-          </View>
-
-          {/* Puzzle Grid */}
-          <View style={styles.puzzleGrid}>
-            {Array.from({ length: totalPuzzles }, (_, i) => {
-              const puzzleId = `${boardSize}x${boardSize}-${String(i + 1).padStart(4, '0')}`;
-              const isCompleted = completedPuzzleIds.includes(puzzleId);
-
-              return (
-                <Pressable
-                  key={i}
-                  onPress={() => onSelectPuzzle(i)}
+          <ScrollView
+            nestedScrollEnabled={true}
+            showsVerticalScrollIndicator={true}
+            style={styles.scrollContainer}
+          >
+            {/* Progress Bar */}
+            <View style={styles.progressContainer}>
+              <View style={styles.progressBar}>
+                <View
                   style={[
-                    styles.puzzleButton,
-                    isCompleted && styles.puzzleButtonCompleted,
+                    styles.progressFill,
+                    { width: `${progressPercent}%`, backgroundColor: info.color },
                   ]}
-                >
-                  <Text style={[
-                    styles.puzzleNumber,
-                    isCompleted && styles.puzzleNumberCompleted,
-                  ]}>
-                    {i + 1}
-                  </Text>
-                  {isCompleted && (
-                    <View style={styles.checkmark}>
-                      <Check size={12} color={info.color} strokeWidth={3} />
-                    </View>
-                  )}
-                </Pressable>
-              );
-            })}
-          </View>
+                />
+              </View>
+              <Text style={styles.progressText}>{progressPercent}% Complete</Text>
+            </View>
+
+            {/* Puzzle Grid */}
+            <View style={styles.puzzleGrid}>
+              {Array.from({ length: totalPuzzles }, (_, i) => {
+                const puzzleId = `${boardSize}x${boardSize}-${String(i + 1).padStart(4, '0')}`;
+                const isCompleted = completedPuzzleIds.includes(puzzleId);
+
+                return (
+                  <Pressable
+                    key={i}
+                    onPress={() => onSelectPuzzle(i)}
+                    style={[
+                      styles.puzzleButton,
+                      isCompleted && styles.puzzleButtonCompleted,
+                    ]}
+                  >
+                    <Text style={[
+                      styles.puzzleNumber,
+                      isCompleted && styles.puzzleNumberCompleted,
+                    ]}>
+                      {i + 1}
+                    </Text>
+                    {isCompleted && (
+                      <View style={styles.checkmark}>
+                        <Check size={12} color={info.color} strokeWidth={3} />
+                      </View>
+                    )}
+                  </Pressable>
+                );
+              })}
+            </View>
+          </ScrollView>
         </Animated.View>
       )}
     </View>
@@ -156,6 +171,9 @@ const styles = StyleSheet.create({
   },
   expandedContent: {
     overflow: 'hidden',
+  },
+  scrollContainer: {
+    flex: 1,
   },
   progressContainer: {
     paddingHorizontal: 20,

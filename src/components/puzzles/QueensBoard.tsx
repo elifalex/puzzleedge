@@ -24,6 +24,7 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
   const [dragMode, setDragMode] = useState<'mark' | 'clear' | null>(null);
   const [pressStartCell, setPressStartCell] = useState<[number, number] | null>(null);
   const [wasRecentlyDragging, setWasRecentlyDragging] = useState(false);
+  const [lastDragCell, setLastDragCell] = useState<[number, number] | null>(null);
   const [hintCells, setHintCells] = useState<[number, number][]>([]);
   const [hintRegion, setHintRegion] = useState<number | null>(null);
   const [hintMessage, setHintMessage] = useState<string | null>(null);
@@ -88,19 +89,55 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
     return true;
   };
 
+  // Get all cells between two points using Bresenham's line algorithm
+  const interpolateCells = (
+    fromRow: number,
+    fromCol: number,
+    toRow: number,
+    toCol: number
+  ): [number, number][] => {
+    const cells: [number, number][] = [];
+
+    let row = fromRow;
+    let col = fromCol;
+    const deltaRow = Math.abs(toRow - fromRow);
+    const deltaCol = Math.abs(toCol - fromCol);
+    const stepRow = fromRow < toRow ? 1 : -1;
+    const stepCol = fromCol < toCol ? 1 : -1;
+    let error = deltaCol - deltaRow;
+
+    while (true) {
+      // Add current cell if it's within bounds
+      if (row >= 0 && row < puzzle.size && col >= 0 && col < puzzle.size) {
+        cells.push([row, col]);
+      }
+
+      // If we've reached the destination, break
+      if (row === toRow && col === toCol) break;
+
+      const error2 = 2 * error;
+      if (error2 > -deltaRow) {
+        error -= deltaRow;
+        col += stepCol;
+      }
+      if (error2 < deltaCol) {
+        error += deltaCol;
+        row += stepRow;
+      }
+    }
+
+    return cells;
+  };
+
   const handlePressStart = (row: number, col: number) => {
     setPressStartCell([row, col]);
+    setLastDragCell([row, col]);
   };
 
   const handleDragOver = (row: number, col: number) => {
     if (!pressStartCell) return;
 
     const [startRow, startCol] = pressStartCell;
-    const cellKey = `${row}-${col}`;
-    const hasQueen = placedQueens.some(([r, c]) => r === row && c === col);
-
-    // Don't affect cells with queens
-    if (hasQueen) return;
 
     // If we haven't started dragging yet but moved to a different cell, start dragging
     if (!isDragging && (startRow !== row || startCol !== col)) {
@@ -124,22 +161,36 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
       }
     }
 
-    // Apply drag to current cell (including start cell when dragging starts)
-    if (isDragging || (pressStartCell && (startRow !== row || startCol !== col))) {
-      const mode = dragMode || (markedCells.has(`${startRow}-${startCol}`) ? 'clear' : 'mark');
-      const hasMarker = markedCells.has(cellKey);
+    // Interpolate cells between last position and current position to catch fast drags
+    if (isDragging && lastDragCell) {
+      const [lastRow, lastCol] = lastDragCell;
+      const cellsToProcess = interpolateCells(lastRow, lastCol, row, col);
 
-      // Apply drag mode to this cell
-      if (mode === 'mark' && !hasMarker) {
-        setMarkedCells((prev) => new Set(prev).add(cellKey));
-      } else if (mode === 'clear' && hasMarker) {
-        setMarkedCells((prev) => {
-          const newSet = new Set(prev);
-          newSet.delete(cellKey);
-          return newSet;
-        });
-      }
+      setMarkedCells((prev) => {
+        const newSet = new Set(prev);
+        const mode = dragMode || 'mark';
+
+        for (const [cellRow, cellCol] of cellsToProcess) {
+          const cellKey = `${cellRow}-${cellCol}`;
+          const hasQueen = placedQueens.some(([r, c]) => r === cellRow && c === cellCol);
+
+          // Don't affect cells with queens
+          if (hasQueen) continue;
+
+          // Apply drag mode to this cell
+          if (mode === 'mark') {
+            newSet.add(cellKey);
+          } else if (mode === 'clear') {
+            newSet.delete(cellKey);
+          }
+        }
+
+        return newSet;
+      });
     }
+
+    // Update last drag position
+    setLastDragCell([row, col]);
   };
 
   const handlePressEnd = () => {
@@ -153,6 +204,7 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
     }
 
     setPressStartCell(null);
+    setLastDragCell(null);
     setIsDragging(false);
     setDragMode(null);
   };
@@ -166,25 +218,34 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
     // For React Native Web (mobile browsers), use getBoundingClientRect
     const boardElement = boardRef.current as any;
     if (boardElement.getBoundingClientRect) {
-      // Web/mobile browser path
+      // Web/mobile browser path - more precise coordinate mapping
       const rect = boardElement.getBoundingClientRect();
-      const relativeX = touch.clientX - rect.left - 16; // 16 is board padding
-      const relativeY = touch.clientY - rect.top - 16;
+      const boardPadding = 16; // From styles.board.padding
 
-      const col = Math.floor(relativeX / cellSize);
-      const row = Math.floor(relativeY / cellSize);
+      // Calculate relative position within the board (excluding padding)
+      const relativeX = touch.clientX - rect.left - boardPadding;
+      const relativeY = touch.clientY - rect.top - boardPadding;
 
+      // Round to nearest cell center for better accuracy
+      // Add 0.5 * cellSize to check against cell centers instead of edges
+      const col = Math.floor((relativeX + cellSize * 0.1) / cellSize);
+      const row = Math.floor((relativeY + cellSize * 0.1) / cellSize);
+
+      // Strict boundary check
       if (row >= 0 && row < puzzle.size && col >= 0 && col < puzzle.size) {
         handleDragOver(row, col);
       }
     } else if (touch.locationX !== undefined && touch.locationY !== undefined) {
-      // Native mobile path (fallback)
-      const relativeX = touch.locationX - 16;
-      const relativeY = touch.locationY - 16;
+      // Native mobile path (fallback) - improved precision
+      const boardPadding = 16;
+      const relativeX = touch.locationX - boardPadding;
+      const relativeY = touch.locationY - boardPadding;
 
-      const col = Math.floor(relativeX / cellSize);
-      const row = Math.floor(relativeY / cellSize);
+      // Round to nearest cell center
+      const col = Math.floor((relativeX + cellSize * 0.1) / cellSize);
+      const row = Math.floor((relativeY + cellSize * 0.1) / cellSize);
 
+      // Strict boundary check
       if (row >= 0 && row < puzzle.size && col >= 0 && col < puzzle.size) {
         handleDragOver(row, col);
       }
@@ -293,10 +354,11 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
   };
 
   // Improved cell size calculation for better touch targets
+  // iOS Human Interface Guidelines recommend 44pt minimum, we use 48px for better accuracy
   const cellSize = Math.max(
-    40, // Minimum size for touch accuracy
+    48, // Minimum size for touch accuracy (iOS guidelines: 44pt)
     Math.min(
-      60, // Maximum size
+      64, // Maximum size (increased for better visibility)
       Math.floor((Dimensions.get('window').width - 64) / puzzle.size)
     )
   );
@@ -334,6 +396,7 @@ export function QueensBoard({ puzzle, mode, onComplete }: QueensBoardProps) {
                   onPressOut={handlePressEnd}
                   onHoverIn={() => handleDragOver(r, c)}
                   disabled={countdown !== null}
+                  hitSlop={{ top: 2, bottom: 2, left: 2, right: 2 }} // Expand touch target
                   style={[
                     styles.cell,
                     {

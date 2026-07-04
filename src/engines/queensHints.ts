@@ -42,7 +42,8 @@ export class QueensHintEngine {
 
   /**
    * Get the next logical hint based on current board state
-   * Priority: Eliminations → Logical Deductions → Naked Singles (last resort)
+   * NEW: Solution-aware system (like Tango hints)
+   * Priority: Wrong Queens → Correct Queen Placement → Eliminations → Logical Deductions
    */
   getIntelligentHint(
     puzzle: QueensPuzzle,
@@ -54,35 +55,179 @@ export class QueensHintEngine {
       return null;
     }
 
-    // Priority 1: Fix conflicts first
+    // Priority 1: Detect incorrectly placed queens (compare with solution)
+    const wrongQueenHint = this.findWrongQueenPlacement(puzzle, placedQueens);
+    if (wrongQueenHint) return wrongQueenHint;
+
+    // Priority 2: Fix rule-violating conflicts
     const conflictHint = this.checkConflicts(puzzle, placedQueens);
     if (conflictHint) return conflictHint;
 
-    // Priority 2: Eliminate cells adjacent to placed queens
+    // Priority 3: Suggest correct queen placement with reasoning (solution-aware)
+    const correctQueenHint = this.suggestCorrectQueenPlacement(puzzle, placedQueens, markedCells);
+    if (correctQueenHint) return correctQueenHint;
+
+    // Priority 4: Eliminate cells adjacent to placed queens
     const adjacentHint = this.findAdjacentEliminations(puzzle, placedQueens, markedCells);
     if (adjacentHint) return adjacentHint;
 
-    // Priority 3: Eliminate entire row/column of placed queens
+    // Priority 5: Eliminate entire row/column of placed queens
     const rowColHint = this.findRowColumnEliminations(puzzle, placedQueens, markedCells);
     if (rowColHint) return rowColHint;
 
-    // Priority 4: Region elimination logic (limited span analysis)
+    // Priority 6: Region elimination logic (limited span analysis)
     const regionHint = this.findRegionConstraintEliminations(puzzle, placedQueens, markedCells);
     if (regionHint) return regionHint;
 
-    // Priority 5: Pairing/group elimination
+    // Priority 7: Pairing/group elimination
     const pairingHint = this.findPairingEliminations(puzzle, placedQueens, markedCells);
     if (pairingHint) return pairingHint;
 
-    // Priority 6: Naked Single (only ONE valid cell left) - last resort
+    // Priority 8: Naked Single (only ONE valid cell left) - last resort
     const nakedSingleHint = this.findNakedSingle(puzzle, placedQueens, markedCells);
     if (nakedSingleHint) return nakedSingleHint;
 
     // No hints available
     return {
-      message: 'Use logic to eliminate impossible cells. Look for regions with limited row/column presence.',
+      message: 'Continue eliminating impossible cells. Look at regions with limited options and queens already placed.',
       type: 'logical_deduction',
     };
+  }
+
+  /**
+   * NEW: Detect incorrectly placed queens by comparing with solution
+   */
+  private findWrongQueenPlacement(
+    puzzle: QueensPuzzle,
+    placedQueens: [number, number][]
+  ): HintResult | null {
+    if (placedQueens.length === 0) return null;
+
+    // Check each placed queen against the solution
+    for (const [row, col] of placedQueens) {
+      const isCorrect = puzzle.solution.some(([sr, sc]) => sr === row && sc === col);
+
+      if (!isCorrect) {
+        // This queen is in the wrong position
+        const regionId = puzzle.regions[row][col];
+        const colorName = this.getColorName(puzzle.regionColors[regionId]);
+
+        // Find where this region's queen SHOULD be
+        const correctQueen = puzzle.solution.find(([sr, sc]) => puzzle.regions[sr][sc] === regionId);
+
+        if (correctQueen) {
+          const [correctRow, correctCol] = correctQueen;
+
+          return {
+            message: `The queen in the ${colorName} region at row ${row + 1}, column ${col + 1} is incorrectly placed. This region's queen should be at row ${correctRow + 1}, column ${correctCol + 1}. Try removing it and reconsidering.`,
+            highlightCells: [[row, col]],
+            highlightRegion: regionId,
+            type: 'conflict',
+          };
+        } else {
+          return {
+            message: `The queen at row ${row + 1}, column ${col + 1} is incorrectly placed. Consider removing it and analyzing the constraints.`,
+            highlightCells: [[row, col]],
+            type: 'conflict',
+          };
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * NEW: Suggest correct queen placement with logical reasoning
+   */
+  private suggestCorrectQueenPlacement(
+    puzzle: QueensPuzzle,
+    placedQueens: [number, number][],
+    markedCells: Set<string>
+  ): HintResult | null {
+    const usedRegions = new Set(placedQueens.map(([r, c]) => puzzle.regions[r][c]));
+    const usedRows = new Set(placedQueens.map(([r]) => r));
+    const usedCols = new Set(placedQueens.map(([, c]) => c));
+
+    // Find the best region to place a queen next
+    // Prioritize regions with fewest valid options
+    interface RegionOption {
+      regionId: number;
+      validCells: [number, number][];
+      colorName: string;
+    }
+
+    const regionsWithOptions: RegionOption[] = [];
+
+    for (let regionId = 0; regionId < puzzle.size; regionId++) {
+      if (usedRegions.has(regionId)) continue;
+
+      const validCells = getValidCellsInRegion(puzzle, regionId, placedQueens, markedCells);
+
+      if (validCells.length > 0 && validCells.length <= 3) {
+        // Only consider regions with 1-3 options
+        regionsWithOptions.push({
+          regionId,
+          validCells,
+          colorName: this.getColorName(puzzle.regionColors[regionId]),
+        });
+      }
+    }
+
+    // Sort by fewest options first
+    regionsWithOptions.sort((a, b) => a.validCells.length - b.validCells.length);
+
+    if (regionsWithOptions.length > 0) {
+      const bestRegion = regionsWithOptions[0];
+
+      // Find the correct queen position from the solution for this region
+      const correctQueen = puzzle.solution.find(
+        ([sr, sc]) => puzzle.regions[sr][sc] === bestRegion.regionId
+      );
+
+      if (correctQueen && bestRegion.validCells.some(([r, c]) => r === correctQueen[0] && c === correctQueen[1])) {
+        const [correctRow, correctCol] = correctQueen;
+
+        // Build reasoning for why this is the correct position
+        let reasoning = '';
+
+        if (bestRegion.validCells.length === 1) {
+          reasoning = `The ${bestRegion.colorName} region has only ONE valid cell remaining after eliminations. `;
+        } else {
+          reasoning = `The ${bestRegion.colorName} region has ${bestRegion.validCells.length} possible cells. `;
+        }
+
+        // Check why other cells in valid list are wrong
+        const wrongCells = bestRegion.validCells.filter(
+          ([r, c]) => r !== correctRow || c !== correctCol
+        );
+
+        if (wrongCells.length > 0 && bestRegion.validCells.length <= 2) {
+          // Explain why the highlighted cell is better
+          const otherRows = new Set(wrongCells.map(([r]) => r));
+          const otherCols = new Set(wrongCells.map(([, c]) => c));
+
+          if (otherRows.size === wrongCells.length) {
+            reasoning += `Row ${correctRow + 1} is the best choice because it leaves more flexibility for remaining regions.`;
+          } else if (otherCols.size === wrongCells.length) {
+            reasoning += `Column ${correctCol + 1} is the best choice because it leaves more flexibility for remaining regions.`;
+          } else {
+            reasoning += `Row ${correctRow + 1}, column ${correctCol + 1} is the optimal position.`;
+          }
+        } else {
+          reasoning += `The queen should go at row ${correctRow + 1}, column ${correctCol + 1}.`;
+        }
+
+        return {
+          message: reasoning,
+          highlightCells: [[correctRow, correctCol]],
+          highlightRegion: bestRegion.regionId,
+          type: 'logical_deduction',
+        };
+      }
+    }
+
+    return null;
   }
 
   /**
