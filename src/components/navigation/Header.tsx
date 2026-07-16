@@ -56,6 +56,14 @@ export function Header() {
               </Pressable>
             </Link>
 
+            <Link href="/games/zip" asChild>
+              <Pressable style={styles.navLink}>
+                <Text style={[styles.navLinkText, isActive('/games/zip') && styles.navLinkActive]}>
+                  Zip
+                </Text>
+              </Pressable>
+            </Link>
+
             <Link href="/articles" asChild>
               <Pressable style={styles.navLink}>
                 <Text style={[styles.navLinkText, isActive('/articles') && styles.navLinkActive]}>
@@ -113,6 +121,17 @@ export function Header() {
             >
               <Text style={[styles.mobileNavLinkText, isActive('/games/tango') && styles.mobileNavLinkActive]}>
                 Tango Game
+              </Text>
+            </Pressable>
+          </Link>
+
+          <Link href="/games/zip" asChild>
+            <Pressable
+              style={styles.mobileNavLink}
+              onPress={() => setMobileMenuOpen(false)}
+            >
+              <Text style={[styles.mobileNavLinkText, isActive('/games/zip') && styles.mobileNavLinkActive]}>
+                Zip Game
               </Text>
             </Pressable>
           </Link>

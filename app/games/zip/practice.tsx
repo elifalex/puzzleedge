@@ -2,27 +2,25 @@ import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { useState, useEffect } from 'react';
 import { Link, useRouter } from 'expo-router';
 import { CategoryCard } from '../../../src/components/ui/CategoryCard';
-import { BoardSize, getPuzzleCount } from '../../../src/data/queensPuzzleLoader';
+import { ZipBoardSize, getZipPuzzleCount } from '../../../src/data/zipPuzzleLoader';
 import { useGameStore } from '../../../src/store/gameStore';
 import { SEO } from '../../../src/components/SEO';
 
-const BOARD_SIZES: BoardSize[] = [6, 7, 8, 9];
+const BOARD_SIZES: ZipBoardSize[] = [5, 6, 7];
 
 const CATEGORY_INFO = {
-  6: { label: 'Beginner', color: '#22C55E' },
-  7: { label: 'Intermediate', color: '#4F6EF7' },
-  8: { label: 'Advanced', color: '#F59E0B' },
-  9: { label: 'Expert', color: '#9333EA' },
+  5: { label: 'Easy', color: '#22C55E' },
+  6: { label: 'Medium', color: '#4F6EF7' },
+  7: { label: 'Hard', color: '#F59E0B' },
 };
 
-export default function QueensPracticePage() {
+export default function ZipPracticePage() {
   const router = useRouter();
-  const [expandedCategory, setExpandedCategory] = useState<BoardSize | null>(null);
-  const [puzzleCounts, setPuzzleCounts] = useState<Record<BoardSize, number>>({
+  const [expandedCategory, setExpandedCategory] = useState<ZipBoardSize | null>(null);
+  const [puzzleCounts, setPuzzleCounts] = useState<Record<ZipBoardSize, number>>({
+    5: 0,
     6: 0,
     7: 0,
-    8: 0,
-    9: 0,
   });
 
   const getCompletedPuzzleIds = useGameStore((s) => s.getCompletedPuzzleIds);
@@ -32,12 +30,12 @@ export default function QueensPracticePage() {
     const loadCounts = async () => {
       const counts = await Promise.all(
         BOARD_SIZES.map(async (size) => {
-          const count = await getPuzzleCount(size);
+          const count = await getZipPuzzleCount(size);
           return { size, count };
         })
       );
 
-      const countsMap: Record<BoardSize, number> = { 6: 0, 7: 0, 8: 0, 9: 0 };
+      const countsMap: Record<ZipBoardSize, number> = { 5: 0, 6: 0, 7: 0 };
       counts.forEach(({ size, count }) => {
         countsMap[size] = count;
       });
@@ -48,41 +46,40 @@ export default function QueensPracticePage() {
     loadCounts();
   }, []);
 
-  const handleToggle = (boardSize: BoardSize) => {
+  const handleToggle = (boardSize: ZipBoardSize) => {
     setExpandedCategory(expandedCategory === boardSize ? null : boardSize);
   };
 
-  const handleSelectPuzzle = (boardSize: BoardSize, index: number) => {
-    router.push(`/games/queens/puzzle?boardSize=${boardSize}&index=${index}`);
+  const handleSelectPuzzle = (boardSize: ZipBoardSize, index: number) => {
+    router.push(`/games/zip/puzzle?boardSize=${boardSize}&index=${index}`);
   };
 
   return (
     <>
       <SEO
-        title="Queens Puzzle Practice - Unlimited LinkedIn Puzzles Training"
-        description="Practice Queens puzzles with 1,600+ puzzles across 4 difficulty levels! Unlimited free practice to master LinkedIn Queens puzzle strategy. Track your progress and improve your skills."
+        title="Zip Puzzle Practice - Unlimited Path Puzzles Training"
+        description="Practice Zip puzzles with unlimited puzzles across 3 difficulty levels! Free practice to master path drawing puzzle strategy."
         keywords={[
-          'Queens puzzle practice',
-          'unlimited Queens puzzles',
-          'LinkedIn puzzle practice',
-          'Queens puzzle training',
-          'practice puzzle games',
-          'Queens puzzle solver',
-          'learn Queens strategy',
+          'Zip puzzle practice',
+          'unlimited Zip puzzles',
+          'Zip puzzle training',
+          'practice path puzzles',
+          'Zip puzzle solver',
+          'learn Zip strategy',
           'puzzle practice mode'
         ]}
-        canonicalUrl="https://puzzleedge.app/games/queens/practice"
+        canonicalUrl="https://puzzleedge.app/games/zip/practice"
       />
       <View style={styles.container}>
         <ScrollView style={styles.scrollContent}>
           <View style={styles.content}>
-            <Link href="/games/queens" style={styles.backLink}>
+            <Link href="/games/zip" style={styles.backLink}>
               <Text style={styles.backText}>← Back</Text>
             </Link>
 
-            <Text style={styles.title}>Unlimited Queens Practice</Text>
+            <Text style={styles.title}>Unlimited Zip Practice</Text>
             <Text style={styles.subtitle}>
-              Select a category and choose any Queens puzzle to practice
+              Select a category and choose any Zip puzzle to practice
             </Text>
 
             <View style={styles.categories}>
@@ -122,13 +119,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 32,
-    paddingBottom: 32, // Extra padding for sticky ad
-  },
-  stickyAd: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    paddingBottom: 32,
   },
   backLink: {
     marginBottom: 32,
@@ -151,6 +142,47 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   categories: {
-    gap: 16,
+    maxWidth: 600,
+    alignSelf: 'center',
+    width: '100%',
+  },
+  categoryCard: {
+    backgroundColor: '#13131A',
+    padding: 24,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#2A2A3D',
+    marginBottom: 16,
+  },
+  categoryHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  categoryTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#F0F0F8',
+  },
+  difficultyBadge: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#4F6EF7',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(79, 110, 247, 0.2)',
+    borderRadius: 12,
+  },
+  categoryDescription: {
+    fontSize: 14,
+    color: '#8888AA',
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  startText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#4F6EF7',
   },
 });

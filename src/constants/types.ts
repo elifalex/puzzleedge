@@ -47,9 +47,15 @@ export interface TangoConstraint {
 export interface ZipPuzzle {
   size: number;
   checkpoints: { position: [number, number]; order: number }[];
+  walls: ZipWall[]; // walls between cells
   solution: [number, number][]; // ordered cells in solution path
   seed: number;
   difficulty: Difficulty;
+}
+
+export interface ZipWall {
+  cell: [number, number]; // cell position
+  direction: 'right' | 'down'; // wall on right side or bottom side of cell
 }
 
 // Game State Types

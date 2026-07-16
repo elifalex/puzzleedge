@@ -1,7 +1,9 @@
 import { create } from 'zustand';
 import { Platform } from 'react-native';
 import { GameScore, GameStreak, DailyCompletion } from '../constants/types';
-import { BoardSize } from '../data/queensPuzzleLoader';
+
+// Common board size type that works for all games (Queens: 6-9, Zip: 5-7, Tango: 4-7)
+export type PuzzleBoardSize = number;
 
 interface PuzzleCompletion {
   puzzleId: string;
@@ -19,9 +21,9 @@ interface GameStore {
   updateStreak: (gameType: string) => void;
   addScore: (gameType: string, score: GameScore) => void;
   getDailyCompletion: (gameType: string, date: string) => DailyCompletion | null;
-  markPuzzleComplete: (boardSize: BoardSize, puzzleId: string, score: GameScore) => void;
-  isPuzzleCompleted: (boardSize: BoardSize, puzzleId: string) => boolean;
-  getCompletedPuzzleIds: (boardSize: BoardSize) => string[];
+  markPuzzleComplete: (boardSize: PuzzleBoardSize, puzzleId: string, score: GameScore) => void;
+  isPuzzleCompleted: (boardSize: PuzzleBoardSize, puzzleId: string) => boolean;
+  getCompletedPuzzleIds: (boardSize: PuzzleBoardSize) => string[];
 }
 
 // Enhanced localStorage implementation with better error handling and logging
@@ -144,7 +146,7 @@ const storeImpl = (set: any, get: any) => ({
     return get().dailyCompletions[`${gameType}-${date}`] || null;
   },
 
-  markPuzzleComplete: (boardSize: BoardSize, puzzleId: string, score: GameScore) => {
+  markPuzzleComplete: (boardSize: PuzzleBoardSize, puzzleId: string, score: GameScore) => {
     const key = `${boardSize}x${boardSize}`;
 
     set((state: GameStore) => {
@@ -179,13 +181,13 @@ const storeImpl = (set: any, get: any) => ({
     console.log(`[PuzzleEdge] Marked puzzle ${puzzleId} as complete`);
   },
 
-  isPuzzleCompleted: (boardSize: BoardSize, puzzleId: string) => {
+  isPuzzleCompleted: (boardSize: PuzzleBoardSize, puzzleId: string) => {
     const key = `${boardSize}x${boardSize}`;
     const completions = get().completedPuzzles[key] || [];
     return completions.some(p => p.puzzleId === puzzleId);
   },
 
-  getCompletedPuzzleIds: (boardSize: BoardSize) => {
+  getCompletedPuzzleIds: (boardSize: PuzzleBoardSize) => {
     const key = `${boardSize}x${boardSize}`;
     const completions = get().completedPuzzles[key] || [];
     return completions.map(p => p.puzzleId);

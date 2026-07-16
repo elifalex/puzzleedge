@@ -6,15 +6,17 @@ export default function HomePage() {
   return (
     <>
       <SEO
-        title="PuzzleEdge - LinkedIn Puzzles & Brain Games | Queens & Tango Puzzles"
-        description="Play LinkedIn Puzzles for free! Master Queens and Tango puzzle games with daily challenges and unlimited practice. Train your brain with logic puzzles similar to LinkedIn's daily puzzle games."
+        title="PuzzleEdge - LinkedIn Puzzles & Brain Games | Queens, Tango & Zip Puzzles"
+        description="Play LinkedIn Puzzles for free! Master Queens, Tango, and Zip puzzle games with daily challenges and unlimited practice. Train your brain with logic puzzles similar to LinkedIn's daily puzzle games."
         keywords={[
           'LinkedIn Queens puzzle',
           'LinkedIn Tango puzzle',
+          'LinkedIn Zip puzzle',
           'free LinkedIn puzzles',
           'LinkedIn puzzle game online',
           'Queens puzzle solver',
           'Tango puzzle solver',
+          'Zip puzzle solver',
           'daily puzzle challenge',
           'LinkedIn games free',
           'practice LinkedIn puzzles',
@@ -37,8 +39,8 @@ export default function HomePage() {
 
               {/* Value Props */}
               <Text style={styles.description}>
-                Train for LinkedIn's daily puzzle games with 2,800+ practice puzzles.
-                Perfect your Queens and Tango puzzle strategy, beat your colleagues, and never miss a streak.
+                Train for LinkedIn's daily puzzle games with unlimited practice puzzles.
+                Perfect your Queens, Tango, and Zip puzzle strategy, beat your colleagues, and never miss a streak.
               </Text>
             </View>
 
@@ -76,10 +78,20 @@ export default function HomePage() {
                 </Pressable>
               </Link>
 
-              <View style={[styles.card, styles.cardDisabled]}>
-                <Text style={styles.cardTitleDisabled}>Zip</Text>
-                <Text style={styles.cardDescriptionDisabled}>Coming Soon</Text>
-              </View>
+              {/* Zip Card */}
+              <Link href="/games/zip" asChild>
+                <Pressable style={styles.card}>
+                  <View style={styles.cardContent}>
+                    <View style={styles.cardText}>
+                      <Text style={styles.cardTitle}>🔗 Zip Puzzle</Text>
+                      <Text style={styles.cardDescription}>
+                        The LinkedIn Zip puzzle: Draw a continuous path through all cells, passing through numbered checkpoints in order. Daily challenges + unlimited practice puzzles.
+                      </Text>
+                    </View>
+                    <Text style={styles.arrow}>→</Text>
+                  </View>
+                </Pressable>
+              </Link>
 
               <View style={[styles.card, styles.cardDisabled]}>
                 <Text style={styles.cardTitleDisabled}>Mini Sudoku</Text>

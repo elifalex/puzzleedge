@@ -1,24 +1,22 @@
 import { View, Text, Pressable, StyleSheet, Animated, ScrollView } from 'react-native';
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, ChevronUp, Check } from 'lucide-react-native';
-import { BoardSize } from '../../data/queensPuzzleLoader';
+
+interface CategoryInfo {
+  label: string;
+  color: string;
+}
 
 interface CategoryCardProps {
-  boardSize: BoardSize;
+  boardSize: number;
   totalPuzzles: number;
   completedCount: number;
   isExpanded: boolean;
   onToggle: () => void;
   onSelectPuzzle: (index: number) => void;
   completedPuzzleIds: string[];
+  categoryInfo: CategoryInfo;
 }
-
-const CATEGORY_INFO = {
-  6: { label: 'Beginner', color: '#22C55E' },
-  7: { label: 'Intermediate', color: '#4F6EF7' },
-  8: { label: 'Advanced', color: '#F59E0B' },
-  9: { label: 'Expert', color: '#9333EA' },
-};
 
 export function CategoryCard({
   boardSize,
@@ -28,9 +26,10 @@ export function CategoryCard({
   onToggle,
   onSelectPuzzle,
   completedPuzzleIds,
+  categoryInfo,
 }: CategoryCardProps) {
   const animationHeight = useRef(new Animated.Value(0)).current;
-  const info = CATEGORY_INFO[boardSize];
+  const info = categoryInfo;
   const progressPercent = Math.round((completedCount / totalPuzzles) * 100);
 
   useEffect(() => {
