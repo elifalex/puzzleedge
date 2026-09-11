@@ -7,13 +7,14 @@ interface ScoreCardProps {
   time: number;
   streak?: number;
   showPercentile?: boolean;
+  difficulty?: 'easy' | 'medium' | 'hard';
   onClose: () => void;
   onNext?: () => void;
   onShare?: () => void;
 }
 
-export function ScoreCard({ visible, time, streak, showPercentile = false, onClose, onNext, onShare }: ScoreCardProps) {
-  const percentile = showPercentile ? calculateMiniSudokuPercentile(time) : null;
+export function ScoreCard({ visible, time, streak, showPercentile = false, difficulty = 'medium', onClose, onNext, onShare }: ScoreCardProps) {
+  const percentile = showPercentile ? calculateMiniSudokuPercentile(time, difficulty) : null;
   const percentileMessage = percentile ? getPercentileMessage(percentile) : null;
   const percentileColor = percentile ? getPercentileTierColor(percentile) : '#4F6EF7';
 

@@ -103,6 +103,7 @@ export default function MiniSudokuDailyPage() {
             time={dailyCompletion.score.time}
             streak={streak.current}
             showPercentile={true}
+            difficulty="medium"
             onClose={() => setShowScore(false)}
           />
         </View>
@@ -134,6 +135,7 @@ export default function MiniSudokuDailyPage() {
               time={completionTime}
               streak={streak.current}
               showPercentile={true}
+              difficulty="medium"
               onClose={() => setShowScore(false)}
             />
           </View>

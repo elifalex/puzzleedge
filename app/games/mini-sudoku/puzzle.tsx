@@ -162,6 +162,7 @@ export default function MiniSudokuPracticePage() {
             visible={showScore}
             time={completionTime}
             showPercentile={true}
+            difficulty={difficulty}
             onNext={currentIndex < totalPuzzles - 1 ? handleScoreNext : undefined}
             onClose={() => setShowScore(false)}
           />
