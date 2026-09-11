@@ -18,8 +18,8 @@ export function ScoreCard({ visible, time, streak, onClose, onNext, onShare }: S
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.card}>
+      <Pressable style={styles.overlay} onPress={onClose}>
+        <Pressable style={styles.card} onPress={(e) => e.stopPropagation()}>
           <Text style={styles.title}>Puzzle Complete! ✅</Text>
 
           <View style={styles.timeContainer}>
@@ -51,8 +51,8 @@ export function ScoreCard({ visible, time, streak, onClose, onNext, onShare }: S
               <Text style={styles.closeButtonText}>Close</Text>
             </Pressable>
           </View>
-        </View>
-      </View>
+        </Pressable>
+      </Pressable>
     </Modal>
   );
 }

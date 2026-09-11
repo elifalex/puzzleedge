@@ -64,6 +64,14 @@ export function Header() {
               </Pressable>
             </Link>
 
+            <Link href="/games/mini-sudoku" asChild>
+              <Pressable style={styles.navLink}>
+                <Text style={[styles.navLinkText, isActive('/games/mini-sudoku') && styles.navLinkActive]}>
+                  Mini Sudoku
+                </Text>
+              </Pressable>
+            </Link>
+
             <Link href="/articles" asChild>
               <Pressable style={styles.navLink}>
                 <Text style={[styles.navLinkText, isActive('/articles') && styles.navLinkActive]}>
@@ -132,6 +140,17 @@ export function Header() {
             >
               <Text style={[styles.mobileNavLinkText, isActive('/games/zip') && styles.mobileNavLinkActive]}>
                 Zip Game
+              </Text>
+            </Pressable>
+          </Link>
+
+          <Link href="/games/mini-sudoku" asChild>
+            <Pressable
+              style={styles.mobileNavLink}
+              onPress={() => setMobileMenuOpen(false)}
+            >
+              <Text style={[styles.mobileNavLinkText, isActive('/games/mini-sudoku') && styles.mobileNavLinkActive]}>
+                Mini Sudoku Game
               </Text>
             </Pressable>
           </Link>

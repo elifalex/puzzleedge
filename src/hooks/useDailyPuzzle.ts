@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useGameStore } from '../store/gameStore';
 import { queensEngine } from '../engines/queens';
-import { QueensPuzzle, TangoPuzzle } from '../constants/types';
+import { miniSudokuEngine } from '../engines/miniSudoku';
+import { QueensPuzzle, TangoPuzzle, MiniSudokuPuzzle } from '../constants/types';
 import { getDailyPuzzle } from '../data/tangoPuzzleLoader';
 
 // Calculate daily seed based on day of year
@@ -22,9 +23,9 @@ function getDailyDifficulty(): 'easy' | 'medium' | 'hard' {
   return 'medium'; // Tuesday, Wednesday, Thursday
 }
 
-export function useDailyPuzzle(gameType: 'queens' | 'tango') {
+export function useDailyPuzzle(gameType: 'queens' | 'tango' | 'miniSudoku') {
   const getDailyCompletion = useGameStore((s) => s.getDailyCompletion);
-  const [puzzle, setPuzzle] = useState<QueensPuzzle | TangoPuzzle | null>(null);
+  const [puzzle, setPuzzle] = useState<QueensPuzzle | TangoPuzzle | MiniSudokuPuzzle | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,6 +40,11 @@ export function useDailyPuzzle(gameType: 'queens' | 'tango') {
           const seed = getDailySeed();
           const difficulty = getDailyDifficulty();
           const loadedPuzzle = await getDailyPuzzle(difficulty, seed);
+          setPuzzle(loadedPuzzle);
+        } else if (gameType === 'miniSudoku') {
+          const seed = miniSudokuEngine.getDailySeed();
+          const difficulty = getDailyDifficulty();
+          const loadedPuzzle = miniSudokuEngine.generate(difficulty, seed);
           setPuzzle(loadedPuzzle);
         }
       } catch (error) {

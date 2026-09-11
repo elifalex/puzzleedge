@@ -58,6 +58,15 @@ export interface ZipWall {
   direction: 'right' | 'down'; // wall on right side or bottom side of cell
 }
 
+// Mini Sudoku Puzzle Types
+export interface MiniSudokuPuzzle {
+  size: 6; // Always 6x6
+  grid: (number | null)[][]; // 6x6 grid, null = empty cell, 1-6 = given clue
+  solution: number[][]; // Complete 6x6 grid with all numbers filled
+  seed: number;
+  difficulty: Difficulty;
+}
+
 // Game State Types
 export interface GameScore {
   time: number; // in milliseconds

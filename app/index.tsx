@@ -6,21 +6,24 @@ export default function HomePage() {
   return (
     <>
       <SEO
-        title="PuzzleEdge - LinkedIn Puzzles & Brain Games | Queens, Tango & Zip Puzzles"
-        description="Play LinkedIn Puzzles for free! Master Queens, Tango, and Zip puzzle games with daily challenges and unlimited practice. Train your brain with logic puzzles similar to LinkedIn's daily puzzle games."
+        title="PuzzleEdge - LinkedIn Puzzles & Brain Games | Queens, Tango, Zip & Mini Sudoku"
+        description="Play LinkedIn Puzzles for free! Master Queens, Tango, Zip, and Mini Sudoku puzzle games with daily challenges and unlimited practice. Train your brain with logic puzzles similar to LinkedIn's daily puzzle games."
         keywords={[
           'LinkedIn Queens puzzle',
           'LinkedIn Tango puzzle',
           'LinkedIn Zip puzzle',
+          'LinkedIn Mini Sudoku puzzle',
           'free LinkedIn puzzles',
           'LinkedIn puzzle game online',
           'Queens puzzle solver',
           'Tango puzzle solver',
           'Zip puzzle solver',
+          'Mini Sudoku solver',
           'daily puzzle challenge',
           'LinkedIn games free',
           'practice LinkedIn puzzles',
-          'puzzle games like LinkedIn'
+          'puzzle games like LinkedIn',
+          '6x6 Sudoku'
         ]}
         canonicalUrl="https://puzzleedge.app"
       />
@@ -40,7 +43,7 @@ export default function HomePage() {
               {/* Value Props */}
               <Text style={styles.description}>
                 Train for LinkedIn's daily puzzle games with unlimited practice puzzles.
-                Perfect your Queens, Tango, and Zip puzzle strategy, beat your colleagues, and never miss a streak.
+                Perfect your Queens, Tango, Zip, and Mini Sudoku puzzle strategy, beat your colleagues, and never miss a streak.
               </Text>
             </View>
 
@@ -93,10 +96,20 @@ export default function HomePage() {
                 </Pressable>
               </Link>
 
-              <View style={[styles.card, styles.cardDisabled]}>
-                <Text style={styles.cardTitleDisabled}>Mini Sudoku</Text>
-                <Text style={styles.cardDescriptionDisabled}>Coming Soon</Text>
-              </View>
+              {/* Mini Sudoku Card */}
+              <Link href="/games/mini-sudoku" asChild>
+                <Pressable style={styles.card}>
+                  <View style={styles.cardContent}>
+                    <View style={styles.cardText}>
+                      <Text style={styles.cardTitle}>🔢 Mini Sudoku Puzzle</Text>
+                      <Text style={styles.cardDescription}>
+                        The LinkedIn Mini Sudoku puzzle: Fill the 6×6 grid with 2×3 boxes. Each row, column, and box must contain 1-6 exactly once. Daily challenges + 1,200 practice puzzles.
+                      </Text>
+                    </View>
+                    <Text style={styles.arrow}>→</Text>
+                  </View>
+                </Pressable>
+              </Link>
 
               <View style={[styles.card, styles.cardDisabled]}>
                 <Text style={styles.cardTitleDisabled}>Crossclimb</Text>

@@ -132,23 +132,68 @@ const zipArticles = [
   },
 ];
 
+const miniSudokuArticles = [
+  {
+    id: 'mini-sudoku-beginners-guide',
+    title: 'Ultimate Beginner\'s Guide to LinkedIn Mini Sudoku Puzzle',
+    description: 'Learn how to solve 6×6 Mini Sudoku puzzles from scratch. Complete tutorial with examples.',
+    icon: BookOpen,
+    readTime: '10 min read',
+    href: '/articles/mini-sudoku-beginners-guide',
+  },
+  {
+    id: 'mini-sudoku-rules-explained',
+    title: 'Mini Sudoku Puzzle Rules Explained with Visual Examples',
+    description: 'Master all 3 essential rules of Mini Sudoku with clear explanations and practical examples.',
+    icon: Lightbulb,
+    readTime: '8 min read',
+    href: '/articles/mini-sudoku-rules-explained',
+  },
+  {
+    id: 'mini-sudoku-advanced-strategies',
+    title: '10 Advanced Mini Sudoku Puzzle Strategies from Experts',
+    description: 'Master naked singles, hidden singles, and advanced elimination techniques for 6×6 Sudoku.',
+    icon: Target,
+    readTime: '10 min read',
+    href: '/articles/mini-sudoku-advanced-strategies',
+  },
+  {
+    id: 'mini-sudoku-common-mistakes',
+    title: 'Common Mini Sudoku Puzzle Mistakes and How to Fix Them',
+    description: 'Avoid the 7 most common Mini Sudoku errors and learn systematic fixes.',
+    icon: AlertCircle,
+    readTime: '8 min read',
+    href: '/articles/mini-sudoku-common-mistakes',
+  },
+  {
+    id: 'mini-sudoku-daily-practice-tips',
+    title: 'Master LinkedIn Mini Sudoku: Daily Practice Tips',
+    description: 'Build a consistent practice routine to improve your Mini Sudoku solving speed and accuracy.',
+    icon: Calendar,
+    readTime: '6 min read',
+    href: '/articles/mini-sudoku-daily-practice-tips',
+  },
+];
+
 export default function ArticlesIndexPage() {
   return (
     <>
       <SEO
-        title="LinkedIn Puzzle Articles & Guides - Queens, Tango, Zip Strategy"
-        description="Expert guides, strategies, and tips for mastering LinkedIn puzzles. Comprehensive articles covering Queens, Tango, and Zip puzzles from beginner basics to advanced techniques."
+        title="LinkedIn Puzzle Articles & Guides - Queens, Tango, Zip, Mini Sudoku Strategy"
+        description="Expert guides, strategies, and tips for mastering LinkedIn puzzles. Comprehensive articles covering Queens, Tango, Zip, and Mini Sudoku puzzles from beginner basics to advanced techniques."
         keywords={[
           'LinkedIn puzzle articles',
           'Queens puzzle guide',
           'Tango puzzle guide',
           'Zip puzzle guide',
+          'Mini Sudoku guide',
           'LinkedIn puzzle strategy',
           'puzzle solving tips',
           'LinkedIn puzzle tutorials',
           'puzzle game guides',
           'LinkedIn puzzle help',
-          'puzzle solving techniques'
+          'puzzle solving techniques',
+          '6x6 Sudoku guide'
         ]}
         canonicalUrl="https://puzzleedge.app/articles"
       />
@@ -157,7 +202,7 @@ export default function ArticlesIndexPage() {
           <View style={styles.header}>
             <Text style={styles.title}>LinkedIn Puzzle Articles & Guides</Text>
             <Text style={styles.subtitle}>
-              Expert insights, strategies, and tips to master Queens, Tango, and Zip puzzles
+              Expert insights, strategies, and tips to master Queens, Tango, Zip, and Mini Sudoku puzzles
             </Text>
           </View>
 
@@ -245,11 +290,39 @@ export default function ArticlesIndexPage() {
             </View>
           </View>
 
+          {/* Mini Sudoku Articles */}
+          <View style={styles.gameSection}>
+            <Text style={styles.gameTitle}>Mini Sudoku Puzzle Articles</Text>
+            <Text style={styles.gameDescription}>
+              Master 6×6 Sudoku puzzles with logical deduction, naked singles, and advanced elimination techniques
+            </Text>
+            <View style={styles.articleGrid}>
+              {miniSudokuArticles.map((article) => {
+                const Icon = article.icon;
+                return (
+                  <Link key={article.id} href={article.href} asChild>
+                    <Pressable style={styles.articleCard}>
+                      <View style={styles.iconContainer}>
+                        <Icon size={28} color="#4F6EF7" />
+                      </View>
+                      <View style={styles.cardContent}>
+                        <Text style={styles.cardTitle}>{article.title}</Text>
+                        <Text style={styles.cardDescription}>{article.description}</Text>
+                        <Text style={styles.readTime}>{article.readTime}</Text>
+                      </View>
+                      <Text style={styles.arrow}>→</Text>
+                    </Pressable>
+                  </Link>
+                );
+              })}
+            </View>
+          </View>
+
           {/* CTA Section */}
           <View style={styles.ctaSection}>
             <Text style={styles.ctaTitle}>Ready to Practice?</Text>
             <Text style={styles.ctaDescription}>
-              Put your knowledge to the test with thousands of practice puzzles across all three games
+              Put your knowledge to the test with thousands of practice puzzles across all four games
             </Text>
             <View style={styles.ctaButtons}>
               <Link href="/games/queens/practice" asChild>
@@ -265,6 +338,11 @@ export default function ArticlesIndexPage() {
               <Link href="/games/zip/practice" asChild>
                 <Pressable style={styles.ctaButton}>
                   <Text style={styles.ctaButtonText}>Practice Zip</Text>
+                </Pressable>
+              </Link>
+              <Link href="/games/mini-sudoku/practice" asChild>
+                <Pressable style={styles.ctaButton}>
+                  <Text style={styles.ctaButtonText}>Practice Mini Sudoku</Text>
                 </Pressable>
               </Link>
             </View>
