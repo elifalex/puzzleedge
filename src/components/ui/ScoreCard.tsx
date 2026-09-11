@@ -1,16 +1,22 @@
 import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
 import { formatTime } from '../../hooks/useTimer';
+import { calculateMiniSudokuPercentile, getPercentileMessage, getPercentileTierColor } from '../../utils/percentileCalculator';
 
 interface ScoreCardProps {
   visible: boolean;
   time: number;
   streak?: number;
+  showPercentile?: boolean;
   onClose: () => void;
   onNext?: () => void;
   onShare?: () => void;
 }
 
-export function ScoreCard({ visible, time, streak, onClose, onNext, onShare }: ScoreCardProps) {
+export function ScoreCard({ visible, time, streak, showPercentile = false, onClose, onNext, onShare }: ScoreCardProps) {
+  const percentile = showPercentile ? calculateMiniSudokuPercentile(time) : null;
+  const percentileMessage = percentile ? getPercentileMessage(percentile) : null;
+  const percentileColor = percentile ? getPercentileTierColor(percentile) : '#4F6EF7';
+
   return (
     <Modal
       visible={visible}
@@ -26,6 +32,14 @@ export function ScoreCard({ visible, time, streak, onClose, onNext, onShare }: S
             <Text style={styles.label}>Time</Text>
             <Text style={styles.time}>{formatTime(time)}</Text>
           </View>
+
+          {showPercentile && percentileMessage && (
+            <View style={[styles.percentileContainer, { borderColor: percentileColor }]}>
+              <Text style={[styles.percentileText, { color: percentileColor }]}>
+                {percentileMessage}
+              </Text>
+            </View>
+          )}
 
           {streak !== undefined && streak > 0 && (
             <View style={styles.streakContainer}>
@@ -114,6 +128,19 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#F59E0B',
+  },
+  percentileContainer: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    marginBottom: 24,
+    borderWidth: 2,
+    backgroundColor: 'rgba(79, 110, 247, 0.1)',
+  },
+  percentileText: {
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center',
   },
   buttons: {
     gap: 12,

@@ -161,6 +161,7 @@ export default function MiniSudokuPracticePage() {
           <ScoreCard
             visible={showScore}
             time={completionTime}
+            showPercentile={true}
             onNext={currentIndex < totalPuzzles - 1 ? handleScoreNext : undefined}
             onClose={() => setShowScore(false)}
           />
